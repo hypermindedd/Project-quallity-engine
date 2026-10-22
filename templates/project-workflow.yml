@@ -1,0 +1,56 @@
+# Copy to <project>/.github/workflows/pqe.yml
+# Requires repository secret PQE_READ_TOKEN: a fine-grained token with read access
+# to hypermindedd/pqe01-project-quality-engine (Contents: read).
+# Optional secrets: ANTHROPIC_API_KEY (advisory design review), NOTION_TOKEN (command-room report).
+name: Project Quality Engine
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write   # upload SARIF findings to code scanning
+
+jobs:
+  pqe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          repository: hypermindedd/pqe01-project-quality-engine
+          token: ${{ secrets.PQE_READ_TOKEN }}
+          path: .pqe-engine
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install engine
+        run: |
+          python -m pip install -e './.pqe-engine[security,ui]'
+          python -m playwright install --with-deps chromium
+      - name: Run engine
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: pqe run . --setup --out pqe-report --publish
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pqe-report
+          path: pqe-report/
+      - name: Upload findings to code scanning
+        if: always() && hashFiles('pqe-report/results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: pqe-report/results.sarif
+          category: pqe

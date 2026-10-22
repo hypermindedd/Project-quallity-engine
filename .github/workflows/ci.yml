@@ -1,0 +1,34 @@
+name: PQE engine CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install engine with all extras
+        run: python -m pip install -e '.[dev,security,ui]'
+      - name: Install Chromium for the browser runner
+        run: python -m playwright install --with-deps chromium
+      - name: Lint
+        run: ruff check src tests
+      - name: Self-tests (includes real browser and HTTP runs)
+        run: python -m pytest -q
+      - name: Validate Claude Code plugin manifests
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude plugin validate ./plugin
+          claude plugin validate .

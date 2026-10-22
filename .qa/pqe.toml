@@ -1,0 +1,43 @@
+# The engine checks itself (dogfooding).
+[project]
+name = "PQE.01 Project Quality Engine"
+goal = "Verify any project against its documented goals honestly: never pass what did not run."
+exclude = ["tests/fixtures/**"]
+
+[pytest]
+argv = ["python", "-m", "pytest", "-q"]
+
+[architecture]
+python_roots = ["src"]
+
+[[architecture.rules]]
+name = "model-is-pure"
+source = "pqe.model"
+forbid = ["pqe.runners", "pqe.orchestrator", "pqe.config", "pqe.context"]
+reason = "Domain types must not depend on execution."
+
+[[architecture.rules]]
+name = "runners-do-not-orchestrate"
+source = "pqe.runners"
+forbid = ["pqe.orchestrator", "pqe.cli", "pqe.remediation"]
+reason = "Runners are leaves; the orchestrator composes them."
+
+[security]
+bandit_paths = ["src"]
+pip_audit = false
+
+[[goals]]
+id = "E1"
+title = "Engine self-tests pass, including real HTTP and browser runs"
+hard_gate = true
+criteria = [{ kind = "check", check = "functional.pytest" }]
+
+[[goals]]
+id = "E2"
+title = "Engine respects its own architecture and has no committed secrets"
+hard_gate = true
+criteria = [
+  { kind = "check", check = "architecture.boundaries" },
+  { kind = "check", check = "security.secrets" },
+  { kind = "check", check = "security.sast.python" },
+]

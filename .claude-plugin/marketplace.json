@@ -1,0 +1,16 @@
+{
+  "name": "pqe-marketplace",
+  "owner": {
+    "name": "A.del"
+  },
+  "plugins": [
+    {
+      "name": "pqe",
+      "source": "./plugin",
+      "description": "Project Quality Engine skills and agents"
+    }
+  ],
+  "metadata": {
+    "description": "Project Quality Engine (PQE.01) for Claude Code"
+  }
+}

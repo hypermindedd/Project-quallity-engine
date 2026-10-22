@@ -1,0 +1,10 @@
+{
+  "name": "pqe",
+  "displayName": "PQE — Project Quality Engine",
+  "version": "0.1.0",
+  "description": "Goal-traced, architecture-aware QA: onboard a project from its documents, run every check, and repair defects on a branch behind a human gate.",
+  "author": { "name": "A.del" },
+  "repository": "https://github.com/hypermindedd/pqe01-project-quality-engine",
+  "license": "MIT",
+  "keywords": ["qa", "testing", "security", "architecture", "ui"]
+}
