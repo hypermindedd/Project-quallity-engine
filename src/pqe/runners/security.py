@@ -263,7 +263,10 @@ class PipAuditRunner(Runner):
         configured = ctx.config.security.pip_audit_requirements
         if configured:
             return configured
-        return [ctx.rel(p) for p in ctx.glob(["requirements*.txt"])]
+        found = [ctx.rel(p) for p in ctx.glob(["requirements*.txt"])]
+        if not found and (ctx.root / "pyproject.toml").exists():
+            found = ["pyproject.toml"]  # audited as a project (pip-audit resolves its declared dependencies)
+        return found
 
     def applicable(self, ctx: RunContext) -> str | None:
         if not ctx.config.security.pip_audit:
@@ -277,10 +280,11 @@ class PipAuditRunner(Runner):
         audited = 0
         errors = []
         for req in self._requirements(ctx):
-            proc = ctx.run(
-                ["pip-audit", "-r", req, "-f", "json", "--progress-spinner", "off", "--no-deps", "--disable-pip"],
-                timeout_s=900,
-            )
+            if req.endswith("pyproject.toml"):
+                argv = ["pip-audit", str((ctx.root / req).parent), "-f", "json", "--progress-spinner", "off"]
+            else:
+                argv = ["pip-audit", "-r", req, "-f", "json", "--progress-spinner", "off", "--no-deps", "--disable-pip"]
+            proc = ctx.run(argv, timeout_s=900)
             try:
                 data = json.loads(proc.stdout or "")
             except json.JSONDecodeError:

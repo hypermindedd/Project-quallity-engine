@@ -68,6 +68,10 @@ class Dimension(StrEnum):
     UI_VISUAL = "UI_VISUAL"
     UI_RESPONSIVE = "UI_RESPONSIVE"
     ACCESSIBILITY = "ACCESSIBILITY"
+    WEB_LINKS = "WEB_LINKS"
+    WEB_SEO = "WEB_SEO"
+    MOBILE_STABILITY = "MOBILE_STABILITY"
+    PLATFORM_SECURITY = "PLATFORM_SECURITY"
     INTEGRITY = "INTEGRITY"
     DOCUMENTATION = "DOCUMENTATION"
 
@@ -194,6 +198,7 @@ class GoalVerdict:
     hard_gate: bool
     source: str = ""
     criteria: list[CriterionVerdict] = field(default_factory=list)
+    proposed: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -201,6 +206,7 @@ class GoalVerdict:
             "title": self.title,
             "status": self.status.value,
             "hard_gate": self.hard_gate,
+            "proposed": self.proposed,
             "source": self.source,
             "criteria": [{**asdict(c), "status": c.status.value} for c in self.criteria],
         }

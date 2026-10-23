@@ -1,0 +1,5 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'com.example.notes'
+    defaultConfig { applicationId "com.example.notes"; minSdk 24; targetSdk 35 }
+}

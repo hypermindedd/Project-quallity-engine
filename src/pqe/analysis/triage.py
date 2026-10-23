@@ -61,6 +61,8 @@ def decide(results: list[CheckResult], goals: list[GoalVerdict]) -> DecisionReco
             blocking.append(f"hard-gate goal {goal.goal_id} NOT_MET")
         elif goal.hard_gate and goal.status != GoalStatus.MET:
             conditions.append(f"hard-gate goal {goal.goal_id} {goal.status.value}")
+        elif goal.status == GoalStatus.NOT_MET and not goal.proposed:
+            conditions.append(f"goal {goal.goal_id} NOT_MET")
     sev1 = [f for f in findings if f.severity == Severity.SEV1]
     if sev1:
         conditions.append(f"{len(sev1)} major (SEV1) finding(s)")

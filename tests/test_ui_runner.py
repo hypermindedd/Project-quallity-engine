@@ -6,6 +6,7 @@ named by ``PQE_CHROMIUM_PATH``. Skipped otherwise — never silently passed.
 
 from __future__ import annotations
 
+import shutil
 import sys
 
 import pytest
@@ -55,7 +56,9 @@ def test_ui_runner_finds_click_errors_overflow_broken_images_and_direction(ctx_f
     assert all(f.severity == Severity.SEV2 for f in responsive.findings)
 
     assert results["ui.visual"].status == Status.UNCALIBRATED  # no approved baselines yet
-    assert results["ui.accessibility"].status == Status.SKIPPED  # no axe script configured
+    # axe-core is provisioned automatically when npm exists; otherwise the check is skipped, never passed.
+    expected = {Status.PASS, Status.FAIL} if shutil.which("npm") else {Status.SKIPPED}
+    assert results["ui.accessibility"].status in expected
     shots = {p.relative_to(ctx.out_dir / "ui").as_posix() for p in (ctx.out_dir / "ui").rglob("*.png")}
     assert {"mobile/index.html.png", "mobile/page2.html.png", "desktop/page2.html.png"} <= shots
     assert len(shots) == 2 * interaction.metrics["pages"]  # every crawled page at every viewport

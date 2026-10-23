@@ -3,4 +3,4 @@
 Goal-traced, architecture-aware automated quality assurance for any project.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

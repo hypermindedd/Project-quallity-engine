@@ -1,0 +1,70 @@
+name: Project Quality Engine
+description: Detects what the project is, designs every test it needs, runs them in a sandbox and reports a release decision.
+author: A.del
+branding:
+  icon: check-circle
+  color: purple
+
+inputs:
+  mode:
+    description: "auto (classify, plan, design, test) | classify (outputs only) | install (engine only)"
+    default: auto
+  target:
+    description: "'' (everything this runner can do) | web | android | ios"
+    default: ""
+  path:
+    description: Project directory inside the workspace
+    default: "."
+  ai:
+    description: Let the AI test designer read the documents and propose goal-level tests (needs ANTHROPIC_API_KEY in env)
+    default: "true"
+  fail-on:
+    description: "no_go (default) | conditional | never (report only)"
+    default: no_go
+  out:
+    description: Report directory
+    default: pqe-report
+
+outputs:
+  targets:
+    description: JSON list of environments the project needs (web, android, ios, windows)
+    value: ${{ steps.classify.outputs.targets }}
+  kinds:
+    description: JSON list of detected project kinds
+    value: ${{ steps.classify.outputs.kinds }}
+  has_android:
+    description: true when an Android emulator job is needed
+    value: ${{ steps.classify.outputs.has_android }}
+  has_ios:
+    description: true when a macOS/iOS simulator job is needed
+    value: ${{ steps.classify.outputs.has_ios }}
+  has_windows:
+    description: true when a Windows-only component (e.g. MQL5) exists
+    value: ${{ steps.classify.outputs.has_windows }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - name: Install engine
+      shell: bash
+      run: python -m pip install --quiet "${{ github.action_path }}[security,ui]"
+    - name: Classify project
+      id: classify
+      if: inputs.mode != 'install'
+      shell: bash
+      run: pqe classify "${{ inputs.path }}" --github-output > /dev/null
+    - name: Browser for UI checks
+      if: inputs.mode == 'auto' && (inputs.target == '' || inputs.target == 'web')
+      shell: bash
+      run: python -m playwright install --with-deps chromium
+    - name: Run engine
+      if: inputs.mode == 'auto'
+      shell: bash
+      run: |
+        args=(auto "${{ inputs.path }}" --out "${{ inputs.out }}" --fail-on "${{ inputs.fail-on }}")
+        [ -n "${{ inputs.target }}" ] && args+=(--target "${{ inputs.target }}")
+        [ "${{ inputs.ai }}" != "true" ] && args+=(--no-ai)
+        pqe "${args[@]}"

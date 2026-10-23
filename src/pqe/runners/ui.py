@@ -67,6 +67,36 @@ DESCRIBE_JS = """
 _AXE_IMPACT = {"critical": Severity.SEV1, "serious": Severity.SEV2, "moderate": Severity.SEV3, "minor": Severity.INFO}
 
 
+_VIEWPORT_SUFFIX = re.compile(r"\s*(?:\((?:{v})\)|at (?:{v}))")
+
+
+def merge_viewports(findings: list[Finding], viewports: list[str]) -> list[Finding]:
+    """One finding per problem: the same issue seen at several screen sizes is merged.
+
+    Issues that are genuinely size-specific (overflow at mobile only) stay separate
+    because their titles differ by more than the viewport name.
+    """
+    pattern = re.compile(_VIEWPORT_SUFFIX.pattern.format(v="|".join(map(re.escape, viewports))))
+    merged: dict[tuple[str, str, str, str], Finding] = {}
+    for f in findings:
+        base_title = pattern.sub("", f.title)
+        if "overflow" in f.title.lower():
+            base_title = f.title  # size-specific by nature
+        loc = f.location.render() if f.location else ""
+        key = (f.check_id, base_title, loc, f.detail[:200])
+        seen_at = [v for v in viewports if re.search(rf"\b{re.escape(v)}\b", f.title) or f.evidence.get("viewport") == v]
+        if key in merged:
+            merged[key].evidence.setdefault("viewports", [])
+            merged[key].evidence["viewports"] = sorted(set(merged[key].evidence["viewports"]) | set(seen_at))
+            continue
+        f.title = base_title
+        f.evidence["key"] = f"{base_title}:{loc}:{f.detail[:80]}"
+        if seen_at:
+            f.evidence["viewports"] = seen_at
+        merged[key] = f
+    return list(merged.values())
+
+
 def launch_options() -> dict[str, Any]:
     """Use Playwright's bundled Chromium, or a system/portable one when
     ``PQE_CHROMIUM_PATH`` is set (e.g. hardened CI images, offline machines)."""
@@ -245,11 +275,12 @@ class UiRunner(Runner):
                         discovered = visited
                     interaction.tests.append(TestCase(f"ui.interaction::{viewport.name}", base, f"{len(visited)} page(s) at {viewport.name}", Status.PASS))
                     context.close()
+                journey_results = self._journeys(ctx, browser, base, session_state, PlaywrightError) if spec.journeys else []
             finally:
                 browser.close()
 
         self._compare(ctx, visual, shots)
-        results = [interaction, responsive, visual]
+        results = [interaction, responsive, visual, *journey_results]
         if axe_source:
             results.append(a11y)
         else:
@@ -264,6 +295,10 @@ class UiRunner(Runner):
                 r.status = Status.FAIL
             r.summary = r.summary or (f"{len(r.findings)} issue(s)" if r.findings else "no issues")
         interaction.metrics = {"pages": len(discovered), "viewports": len(spec.viewports)}
+        for r in results:
+            r.findings = merge_viewports(r.findings, [v.name for v in spec.viewports])
+            if r in (interaction, responsive, a11y):
+                r.summary = f"{len(r.findings)} issue(s)" if r.findings else "no issues"
         return results
 
     # ----------------------------------------------------------- helpers
@@ -275,7 +310,91 @@ class UiRunner(Runner):
             path = ctx.root / rel
             if rel and path.exists():
                 return path.read_text(encoding="utf-8")
-        return ""
+        from ..tools import npm_file
+
+        cached = npm_file("axe-core@4", "axe-core/axe.min.js")
+        return cached.read_text(encoding="utf-8") if cached else ""
+
+    @staticmethod
+    def perform(page: Any, step: Any, base: str, value: str) -> None:
+        """Execute one interaction or assertion. Raises AssertionError on a failed expectation."""
+        action, sel = step.action, step.selector
+        if action == "goto":
+            page.goto(urljoin(base + "/", value.lstrip("/")), wait_until="networkidle", timeout=60_000)
+        elif action == "click":
+            page.click(sel, timeout=10_000)
+        elif action == "fill":
+            page.fill(sel, value, timeout=10_000)
+        elif action == "select":
+            page.select_option(sel, value, timeout=10_000)
+        elif action == "press":
+            page.press(sel, value or "Enter", timeout=10_000)
+        elif action == "wait_for":
+            page.wait_for_selector(sel, timeout=int(value or 20_000))
+        elif action == "wait_ms":
+            page.wait_for_timeout(int(value or 500))
+        elif action == "expect_text":
+            text = page.locator(sel or "body").first.inner_text(timeout=5_000)  # waits for the element
+            if value not in text:
+                raise AssertionError(f"text {value!r} not found in {sel or 'page'}")
+        elif action == "expect_visible":
+            try:
+                page.wait_for_selector(sel, state="visible", timeout=int(value or 8_000))
+            except Exception as exc:  # noqa: BLE001
+                raise AssertionError(f"{sel} is not visible") from exc
+        elif action == "expect_hidden":
+            if page.locator(sel).count() and page.locator(sel).first.is_visible():
+                raise AssertionError(f"{sel} should not be visible")
+        elif action == "expect_url":
+            if value not in page.url:
+                raise AssertionError(f"url {page.url!r} does not contain {value!r}")
+        elif action == "expect_title":
+            if value not in page.title():
+                raise AssertionError(f"title {page.title()!r} does not contain {value!r}")
+
+    def _journeys(self, ctx: RunContext, browser: Any, base: str, state: Any, PlaywrightError: type[Exception]) -> list[CheckResult]:
+        spec = ctx.config.ui
+        desktop = spec.viewports[-1]
+        results = []
+        for journey in spec.journeys:
+            cid = f"ui.journey.{journey.id}"
+            title = ("[proposed] " if journey.proposed else "") + journey.title
+            result = CheckResult(cid, title, Dimension.E2E_FLOW, Status.PASS)
+            severity = Severity.SEV3 if journey.proposed else journey.severity
+            context = browser.new_context(viewport={"width": desktop.width, "height": desktop.height}, storage_state=state)
+            page = context.new_page()
+            collector = _Collector(spec.ignore_console)
+            collector.attach(page, base)
+            try:
+                page.goto(base + "/", wait_until="networkidle", timeout=60_000)
+                for index, step in enumerate(journey.steps, 1):
+                    value = ctx.interpolate(step.value)
+                    before = collector.snapshot()
+                    label = f"{step.action} {step.selector or value}".strip()
+                    try:
+                        self.perform(page, step, base, value)
+                    except (AssertionError, PlaywrightError) as exc:
+                        message = str(exc).splitlines()[0][:300]
+                        result.tests.append(TestCase(f"{cid}::{index:02d}", page.url, label, Status.FAIL, message=message))
+                        shot = ctx.out_dir / "ui" / "journeys" / f"{journey.id}-step{index}.png"
+                        shot.parent.mkdir(parents=True, exist_ok=True)
+                        page.screenshot(path=str(shot), full_page=True)
+                        result.findings.append(Finding(
+                            cid, Dimension.E2E_FLOW, severity, f"Journey '{journey.id}' failed at step {index}: {label}",
+                            detail=ctx.redact(message), location=Location(page.url),
+                            evidence={"key": f"journey:{journey.id}:{index}", "screenshot": ctx.rel(shot), "source": journey.source},
+                        ))
+                        break
+                    result.tests.append(TestCase(f"{cid}::{index:02d}", page.url, label, Status.PASS))
+                    for text in collector.errors[before[1]:]:
+                        result.findings.append(Finding(cid, Dimension.E2E_FLOW, severity, f"Uncaught exception during journey '{journey.id}' step {index}",
+                                                       detail=text, location=Location(page.url), evidence={"key": f"journey:{journey.id}:{index}:exc"}))
+            finally:
+                context.close()
+            result.status = Status.FAIL if result.findings else Status.PASS
+            result.summary = f"{len(result.tests)}/{len(journey.steps)} step(s)" + (" passed" if not result.findings else ", stopped at first failure")
+            results.append(result)
+        return results
 
     @staticmethod
     def _bootstrap(ctx: RunContext, result: CheckResult, page: Any, c: _Collector, base: str, viewport: str,
@@ -286,21 +405,8 @@ class UiRunner(Runner):
             value = ctx.interpolate(step.value, run_vars)
             before = c.snapshot()
             try:
-                if step.action == "goto":
-                    page.goto(urljoin(base + "/", value.lstrip("/")), wait_until="networkidle", timeout=60_000)
-                elif step.action == "click":
-                    page.click(step.selector, timeout=10_000)
-                elif step.action == "fill":
-                    page.fill(step.selector, value, timeout=10_000)
-                elif step.action == "select":
-                    page.select_option(step.selector, value, timeout=10_000)
-                elif step.action == "press":
-                    page.press(step.selector, value or "Enter", timeout=10_000)
-                elif step.action == "wait_for":
-                    page.wait_for_selector(step.selector, timeout=int(value or 20_000))
-                elif step.action == "wait_ms":
-                    page.wait_for_timeout(int(value or 500))
-            except PlaywrightError as exc:
+                UiRunner.perform(page, step, base, value)
+            except (AssertionError, PlaywrightError) as exc:
                 result.findings.append(Finding(
                     "ui.interaction", Dimension.UI_INTERACTION, Severity.SEV1,
                     f"Bootstrap step {index} ({step.action} {step.selector or value}) failed at {viewport}",

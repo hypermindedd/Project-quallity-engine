@@ -1,38 +1,30 @@
 ---
 name: pqe-onboard
-description: Onboard a project into the Project Quality Engine — read its documents, write the .qa/pqe.toml quality contract (goals, architecture rules, API scenarios, UI flow) and author missing tests derived from the documents. Use when a new project needs automated QA or its contract is a fresh draft.
+description: Connect a repository to the Project Quality Engine and review what it designed — run the autonomous mode, read the plan, accept or correct AI-proposed goals, and take ownership of the contract. Use when a project is new to PQE or its generated contract needs review.
 ---
 
 # Onboard a project into PQE
 
-The contract you write is the **test oracle**. Derive every expectation from the project's
-documents (charter, specs, architecture, QA plan, README), never from what the code currently does.
-A test copied from current behaviour only proves the code does what it does.
+The engine designs the tests itself. Your job is to **review**, not to write the contract by hand.
 
-## Steps
-
-1. Run discovery and the draft:
+1. Run the autonomous mode (installs dependencies, explores the running app, designs and runs every test):
    ```bash
-   pqe init .
+   pqe auto .
    ```
-   Read `.qa/profile.json`: languages, frameworks, entrypoints, requirement families, goal statements.
-2. Read the authority documents end to end. Identify:
-   - the product goal (one sentence, with document reference);
-   - requirement identifier families (e.g. `C-01`, `TS-07`) → `[[trace_sources]]` with a regex;
-   - hard gates (anything the documents call release-blocking, safety, privacy, isolation);
-   - architecture boundaries (who may import whom) → `[[architecture.rules]]`, module owners → `[[architecture.modules]]`.
-3. For each goal write `[[goals]]` with `covers` (requirement IDs) and **evidence**:
-   - `tests` criteria selecting existing test IDs (`tests/test_x.py::test_*`), with a sensible `min_tests`;
-   - `check` criteria for engine checks (`api.scenario.<id>`, `security.secrets`, `ui.interaction`, …);
-   - `attestation` only for what genuinely needs a human (live provider, visual acceptance, red team).
-4. API: enable `[api]` with a `start_command` that boots an **isolated** instance (generated secrets,
-   `temp_dirs` for data). Declare endpoints and at least one goal-level `[[api.scenarios]]` flow.
-5. UI: enable `[ui]` with a start command, `expect_dir` (`rtl` for Persian), and `[[ui.actions]]`
-   to reach the app behind its sign-in using a test account. Never point at production.
-6. Gaps: for every goal that has no executable evidence, write the missing tests **from the documents**
-   in the project's own test style, then reference them in the goal. Do not weaken existing tests.
-7. Do not invent thresholds. Leave `[performance]`/`[load]` limits empty until a human approves a baseline.
-8. Run `pqe run . --setup` and iterate on the *contract* (selectors, start commands) until every check
-   either runs or is SKIPPED for a stated reason. Report findings honestly; do not tune expectations to make them pass.
+   Without `ANTHROPIC_API_KEY` add `--no-ai`; the deterministic plan still covers every universal check.
+2. Read `.qa/plan.md` (what was planned and why), `.qa/classification.json` (what the engine thinks the project is)
+   and `.qa/planner.json` (what the AI proposed and what was rejected).
+3. Check the classification against the project's documents. If a component was missed or misread,
+   fix it in `.qa/pqe.toml` (start command, health path, sandbox env, pages, test-account bootstrap in `[[ui.actions]]`).
+4. Review every goal marked `proposed = true`: compare it with the cited document section.
+   - Correct → remove `proposed`; mark it `hard_gate = true` when the documents call it release-critical.
+   - Wrong or unsupported → delete it. Never weaken a correct expectation to match the code.
+5. Declare architecture boundaries from the architecture documents in `[[architecture.rules]]`.
+6. Delete the `pqe:generated` line at the top of `.qa/pqe.toml`. From then on the engine never overwrites it.
+7. Commit `.qa/` and add the CI file:
+   ```bash
+   cp <engine>/templates/project-workflow.yml .github/workflows/pqe.yml
+   ```
 
-Deliver: the contract, any new tests, and a short summary of goals by status (MET / NOT_MET / UNVERIFIED).
+Never mark a SKIPPED, UNCALIBRATED or UNVERIFIED result as passed. Thresholds (latency, Lighthouse, visual diff)
+are set only after a human approves a baseline with `pqe baseline`.

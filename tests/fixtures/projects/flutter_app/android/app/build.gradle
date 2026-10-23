@@ -1,0 +1,2 @@
+plugins { id "com.android.application" }
+android { defaultConfig { applicationId "com.example.wallet" } }

@@ -2,145 +2,136 @@
 
 <div dir="rtl">
 
-موتوری که هر پروژه را از روی **مستنداتش** می‌فهمد، همهٔ ابعاد کیفیت را با ابزارهای قطعی می‌سنجد، تیک می‌زند که **هدف پروژه محقق شده یا نه**، و ایرادها را روی یک شاخهٔ جدا و پشت گیت انسانی اصلاح می‌کند.
+موتوری که به ریپوی هر پروژه‌ای اضافه می‌شود و خودش همه‌چیز را انجام می‌دهد: تشخیص می‌دهد پروژه چیست، طراحی می‌کند به چه آزمون‌هایی نیاز دارد، پروژه را در یک محیط ایزوله و شبیه‌سازی‌شده بالا می‌آورد، همهٔ آزمون‌ها را می‌گیرد و یک تصمیم انتشار همراه با گزارش فارسی تحویل می‌دهد.
+
+## چطور کار می‌کند
+
+۱. **تشخیص نوع پروژه** از روی شواهد واقعی: فایل‌های ساخت، وابستگی‌ها و نقطهٔ شروع برنامه. یک ریپو می‌تواند چند بخش داشته باشد، مثلاً اپ موبایل به‌همراه سرویس پشتیبانش.
+
+۲. **طراحی نقشهٔ آزمون** برای هر نوع، با توضیح اینکه هر آزمون چرا لازم است و در کدام محیط اجرا می‌شود.
+
+۳. **ساخت محیط ایزوله:** رمزها و توکن‌ها تازه و تصادفی ساخته می‌شوند، پوشه‌های داده موقت‌اند و کلید سرویس‌های پولی خالی می‌ماند تا هیچ هزینهٔ واقعی‌ای ایجاد نشود.
+
+۴. **کاوش برنامهٔ در حال اجرا:** صفحه‌ها و مستندات سرویس دیده می‌شوند و هوش مصنوعی از روی مستندات پروژه، هدف‌ها و مسیرهای کاربر را طراحی می‌کند.
+
+۵. **اجرای همهٔ آزمون‌ها** در محیط درست: مرورگر واقعی برای سایت، شبیه‌ساز اندروید برای اپ اندروید و شبیه‌ساز آیفون روی مک.
+
+۶. **گزارش و تصمیم انتشار.**
 
 ## سه اصل غیرقابل‌مذاکره
 
-۱. **پیشگو مستندات است، نه کد.** انتظارها از سند پروژه می‌آیند و در قرارداد کیفیت پروژه ثبت می‌شوند. موتور این قرارداد را هرگز تغییر نمی‌دهد.
+۱. **چیزی که اجرا نشده، قبول نیست.** نتیجه یا قبول است، یا رد، یا خطا، یا «ردشده با دلیل»، یا «اندازه‌گیری‌شده بدون آستانهٔ تأییدشده».
 
-۲. **چیزی که اجرا نشده، قبول نیست.** هر چک یا قبول است، یا رد، یا خطا، یا «ردشده با دلیل»، یا «بدون آستانهٔ تأییدشده». هدفِ بی‌شاهد «تأییدنشده» می‌ماند.
+۲. **پیشنهاد هوش مصنوعی تا تأیید انسان، جلوی انتشار را نمی‌گیرد.** هدف‌هایی که از مستندات استخراج می‌شوند از اولین اجرا گزارش می‌شوند، اما فقط بعد از تأیید یک انسان به گیت انتشار تبدیل می‌شوند.
 
-۳. **معماری قانون است.** موتور تخطی و رانش را پیدا می‌کند و اصلاح پیشنهاد می‌دهد؛ تست‌ها، قرارداد و خط مبنا مسیرهای محافظت‌شده‌اند و اصلاح‌گر حق دست زدن به آن‌ها را ندارد.
+۳. **تصمیم انسان مقدم است.** قراردادی که انسان مالکیتش را گرفته، هرگز توسط موتور بازنویسی نمی‌شود. تست‌ها و قرارداد برای اصلاح‌گر خودکار مسیر ممنوعه‌اند.
 
-## چه چیزهایی سنجیده می‌شود
+## اتصال به یک پروژه
+
+یک بار، در تنظیمات همین ریپوی موتور، دسترسی اکشن‌ها را برای ریپوهای خودت باز کن. مسیر تنظیم:
 
 </div>
 
-| Dimension | Checks | Tools |
-|---|---|---|
-| Goal & traceability | `goals.traceability`, goal verdicts | contract + documents |
-| Functional | `functional.pytest`, `command.*` | pytest, any declared command |
-| Architecture | `architecture.boundaries`, `architecture.mirrors` | Python AST, Tarjan SCC, SHA-256 |
-| Build hygiene | `setup.hermetic` | git |
-| Code quality | `quality.python.defects` | ruff (defect classes) |
-| API contract / robustness | `api.contract`, `api.robustness` | built-in HTTP prober on an isolated instance |
-| End-to-end flows | `api.scenario.*` | contract scenarios with saved variables |
-| Security | `security.secrets`, `security.sast.*`, `security.dependencies.*`, `api.security.*` | built-in scanner, bandit, semgrep, pip-audit, npm/pnpm audit |
-| Speed & load | `performance.latency`, `load.http` | built-in sampler and concurrent load |
-| UI | `ui.interaction`, `ui.responsive`, `ui.visual`, `ui.accessibility`, `ui.design_review` | Playwright, axe-core, Pillow, optional vision review |
-| Integrity & docs | `integrity.checksums`, `docs.references` | SHA-256, document path index |
+```text
+Settings → Actions → General → Access → Accessible from repositories owned by the user
+```
 
 <div dir="rtl">
 
-## نصب
+بعد در هر پروژه، فقط این فایل را اضافه کن:
+
+</div>
+
+```text
+.github/workflows/pqe.yml
+```
+
+```yaml
+name: Project Quality Engine
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  quality:
+    uses: hypermindedd/pqe01-project-quality-engine/.github/workflows/pqe.yml@main
+    with:
+      fail-on: no_go
+    secrets: inherit
+```
+
+<div dir="rtl">
+
+رازهای اختیاری پروژه: کلید هوش مصنوعی برای طراحی آزمون از روی مستندات و بازبینی تصویری، و توکن نوشن برای گزارش در اتاق فرمان. نام رازها:
+
+</div>
+
+```text
+ANTHROPIC_API_KEY
+NOTION_TOKEN
+```
+
+<div dir="rtl">
+
+## اجرای محلی
 
 </div>
 
 ```bash
 pip install -e '.[security,ui]'
-```
-
-```bash
 python -m playwright install chromium
+pqe auto /path/to/project
 ```
 
 <div dir="rtl">
 
-## استفاده
-
-۱. شناخت پروژه و ساخت پیش‌نویس قرارداد:
+دستورهای دیگر:
 
 </div>
 
 ```bash
-pqe init /path/to/project
-```
-
-<div dir="rtl">
-
-۲. تکمیل قرارداد از روی مستندات (در Claude Code با مهارت آنبوردینگ همین پلاگین).
-
-۳. اجرای کامل:
-
-</div>
-
-```bash
-pqe run /path/to/project --setup
-```
-
-<div dir="rtl">
-
-۴. حلقهٔ اصلاح روی شاخهٔ جدا (حداکثر سه دور، ادغام با تو):
-
-</div>
-
-```bash
+pqe classify /path/to/project
+pqe plan /path/to/project
+pqe run /path/to/project
 pqe fix /path/to/project --max-iterations 3
-```
-
-<div dir="rtl">
-
-۵. پذیرش یک اجرای بازبینی‌شده به‌عنوان خط مبنا (برای تشخیص پسرفت):
-
-</div>
-
-```bash
 pqe baseline /path/to/project /path/to/project/.qa/out/RUN/report.json
 ```
 
-<div dir="rtl">
+## What is detected and tested
 
-## خروجی‌ها
+| Project kind | Detected from | Environment | Suites |
+|---|---|---|---|
+| Static site | `index.html`, Jekyll, Hugo, MkDocs | Linux + Chromium | crawl & click, responsive, visual, axe, links, SEO, Lighthouse |
+| Web app | Next, Vite, Vinext, Nuxt, SvelteKit, Astro, Angular, … | Linux + Chromium | the above + project tests, type-check, build, AI journeys |
+| API service | FastAPI (incl. factories), Flask, Django, Express, Fastify, Nest | Linux | OpenAPI contract, hostile input, auth, headers/CORS, latency, load, AI scenarios |
+| Android app | Gradle `com.android.application` | Android emulator (KVM) | manifest audit, build, unit, lint, install/launch/cold start, monkey stress, instrumented, Maestro |
+| Flutter app | `pubspec.yaml` with Flutter SDK | Android emulator | analyze, test, APK, integration tests + all device checks |
+| React Native / Expo | `react-native` / `expo` dependency | Android emulator | jest/tsc, prebuild, APK + all device checks |
+| iOS app | `.xcodeproj` / `.xcworkspace` | macOS simulator | ATS/privacy plist audit, `xcodebuild test` |
+| CLI tool | `[project.scripts]`, `bin` | Linux | tests + every entrypoint starts |
+| Library | `pyproject` / `package.json` exports | Linux | tests, build |
+| MQL5 Expert Advisor | `.mq5` / `.mq4` | Windows (planned, attested) | compile + backtest as human attestation |
 
-هر اجرا یک پوشه در مسیر خروجی پروژه می‌سازد شامل: گزارش فارسی، گزارش ماشینی، خروجی تست برای CI، یافته‌ها برای اسکن کد گیت‌هاب، و برای هر ماژول یک برگهٔ اصلاح. در صورت فعال بودن، خلاصه با اهداف تیک‌خورده در نوشن هم منتشر می‌شود.
+Universal for every project: own test suite, committed secrets, vulnerable dependencies, SAST, dependency cycles,
+documentation references, setup hermeticity.
 
-## اتصال به Claude Code
-
-</div>
-
-```bash
-claude plugin marketplace add hypermindedd/pqe01-project-quality-engine
-```
-
-```bash
-claude plugin install pqe@pqe-marketplace
-```
-
-<div dir="rtl">
-
-## اتصال به CI هر پروژه
-
-فایل نمونهٔ گردش‌کار را در پوشهٔ گردش‌کار پروژه کپی کن و یک توکن فقط‌خواندنی برای همین مخزن به‌عنوان راز مخزن پروژه اضافه کن. نام راز:
-
-</div>
-
-```text
-PQE_READ_TOKEN
-```
-
-<div dir="rtl">
-
-## معماری
-
-</div>
+## Architecture
 
 ```
 src/pqe/
-├── model.py            domain types (Status, Severity, Dimension, Finding, CheckResult)
-├── config.py           strict contract parser (.qa/pqe.toml)
-├── context.py          safe process execution, secrets, file walking
-├── discovery/          read-only project profiling + draft contract
-├── runners/            one concern per runner, self-registering (Open/Closed)
-├── analysis/           goal verdicts, traceability, triage, release decision, advisory LLM review
-├── remediation/        bounded fix loop with protected-path guard
-├── report/             Markdown (fa/en), JSON, JUnit, SARIF, Notion
-└── orchestrator.py     the pipeline
-plugin/                 Claude Code plugin: onboard / run / fix skills, auditor + test-architect agents
-templates/              CI workflow for projects
+├── discovery/   classify.py (kinds + boot hints), profile.py (docs, goals, requirement IDs)
+├── planning/    generate.py (test plan + contract), ai.py (document-driven goals/journeys), auto.py (autonomous mode)
+├── runners/     functional, architecture, integrity, quality, security, api, ui (+journeys), web, mobile
+├── analysis/    goal verdicts, traceability, triage, release decision, advisory visual review
+├── remediation/ bounded fix loop with protected-path guard
+├── report/      Markdown (fa/en), JSON, JUnit, SARIF, Notion
+└── orchestrator.py
+action.yml                     composite action (install / classify / auto)
+.github/workflows/pqe.yml      reusable workflow: classify → web / android / ios jobs
+templates/project-workflow.yml the 10-line file a project adds
+plugin/                        Claude Code skills and agents
 ```
 
-<div dir="rtl">
-
-افزودن یک بُعد تازه یعنی یک فایل اجراکنندهٔ جدید با ثبت خودکار؛ هستهٔ موتور تغییر نمی‌کند.
-
-</div>
+New project kinds are one detector in `classify.py` plus one handler in `generate.py`;
+new checks are one self-registering runner. The core does not change.

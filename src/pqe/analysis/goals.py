@@ -95,7 +95,7 @@ def evaluate_goal(goal: Goal, results: list[CheckResult], attestations: dict[str
         status = GoalStatus.PARTIAL
     else:
         status = GoalStatus.UNVERIFIED
-    return GoalVerdict(goal.id, goal.title, status, goal.hard_gate, goal.source, verdicts)
+    return GoalVerdict(goal.id, goal.title, status, goal.hard_gate, goal.source, verdicts, goal.proposed)
 
 
 def evaluate_goals(config: Config, results: list[CheckResult]) -> list[GoalVerdict]:

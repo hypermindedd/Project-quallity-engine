@@ -72,6 +72,13 @@ class RunContext:
     config: Config
     out_dir: Path
     secrets: dict[str, str] = field(default_factory=dict)
+    target: str = ""  # execution environment of this run ("" = everything)
+
+    def in_target(self, item_target: str) -> bool:
+        """Does a command/goal tagged ``item_target`` belong to this run?"""
+        if not self.target:
+            return True
+        return item_target == self.target or (not item_target and self.target == "web")
 
     @property
     def root(self) -> Path:
@@ -135,8 +142,11 @@ class RunContext:
     ) -> ProcResult:
         argv = self.resolve_argv(argv)
         workdir = (self.root / cwd).resolve() if not Path(cwd).is_absolute() else Path(cwd)
-        if not shutil.which(argv[0]) and not Path(argv[0]).exists():
+        local = workdir / argv[0] if "/" in argv[0] and not Path(argv[0]).is_absolute() else Path(argv[0])
+        if not shutil.which(argv[0]) and not local.exists():
             raise ToolMissing(argv[0])
+        if local.exists() and "/" in argv[0]:
+            argv = [str(local), *argv[1:]]
         started = time.monotonic()
         log.debug("exec %s (cwd=%s)", argv, workdir)
         try:

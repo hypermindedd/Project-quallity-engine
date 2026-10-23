@@ -130,10 +130,11 @@ class ApiProbe:
     def contract(self) -> CheckResult:
         cid, dim = "api.contract", Dimension.API_CONTRACT
         result = CheckResult(cid, "API answers as the contract declares", dim, Status.PASS)
-        health = self.send(f"GET {self.spec.health_path}", "GET", self.spec.health_path, auth=False)
-        result.tests.append(TestCase(f"{cid}::health", self.spec.health_path, "health", Status.PASS if health.status == 200 else Status.FAIL))
-        if health.status != 200:
-            result.findings.append(self.finding(cid, dim, Severity.SEV1, f"Health endpoint returned {health.status or health.error}", self.spec.health_path))
+        if self.spec.health_path:  # empty = the project declares no health endpoint; do not invent one
+            health = self.send(f"GET {self.spec.health_path}", "GET", self.spec.health_path, auth=False)
+            result.tests.append(TestCase(f"{cid}::health", self.spec.health_path, "health", Status.PASS if health.status == 200 else Status.FAIL))
+            if health.status != 200:
+                result.findings.append(self.finding(cid, dim, Severity.SEV1, f"Health endpoint returned {health.status or health.error}", self.spec.health_path))
         for ep in self.endpoints:
             resp = self.send(ep.label, ep.method, ep.concrete_path(), auth=ep.auth, json_body=ep.json)
             ok = (resp.status in ep.expect) if ep.expect else (0 < resp.status < 500)
@@ -185,7 +186,7 @@ class ApiProbe:
         cid, dim = "api.security.headers", Dimension.SECURITY_RUNTIME
         result = CheckResult(cid, "Response hardening headers and CORS", dim, Status.PASS)
         sev = Severity.SEV2 if self.spec.require_security_headers else Severity.INFO
-        sample = self.send("headers", "GET", self.spec.health_path, auth=False)
+        sample = self.send("headers", "GET", self.spec.health_path or "/", auth=False)
         required = {
             "x-content-type-options": "nosniff prevents MIME sniffing",
             "referrer-policy": "limits referrer leakage",
@@ -334,6 +335,8 @@ class ApiProbe:
     # ------------------------------------------------------- performance
     def _safe_targets(self) -> list[Endpoint]:
         targets = [ep for ep in self.endpoints if ep.load_safe]
+        if not self.spec.health_path:
+            return targets or [Endpoint("GET", self.spec.openapi_path or "/", False, None, [], True)]
         health = Endpoint("GET", self.spec.health_path, False, None, [200], True)
         return [health, *targets]
 
@@ -441,7 +444,7 @@ class ApiRunner(Runner):
         if spec.base_url:
             return self._suite(ctx, HttpClient(ctx.interpolate(spec.base_url)), endpoints)
         server = ManagedServer(ctx, spec.start_command, spec.cwd, spec.env, spec.temp_dirs,
-                               spec.health_path, spec.ready_timeout_s, "api-server.log")
+                               spec.health_path or spec.openapi_path or "/", spec.ready_timeout_s, "api-server.log")
         try:
             with server:
                 results = self._suite(ctx, HttpClient(server.base_url), endpoints)

@@ -27,6 +27,8 @@ jobs:
         run: ruff check src tests
       - name: Self-tests (includes real browser and HTTP runs)
         run: python -m pytest -q
+      - name: Autonomous smoke run on every fixture kind (plan only)
+        run: for d in tests/fixtures/projects/*/; do pqe plan "$d" --json > /dev/null; done
       - name: Validate Claude Code plugin manifests
         run: |
           npm install -g @anthropic-ai/claude-code

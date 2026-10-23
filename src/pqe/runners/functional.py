@@ -133,7 +133,7 @@ class CommandsRunner(Runner):
 
     def execute(self, ctx: RunContext) -> list[CheckResult]:
         results = []
-        for spec in ctx.config.commands:
+        for spec in [c for c in ctx.config.commands if ctx.in_target(c.target)]:
             check_id = f"command.{spec.id}"
             if not spec.enabled:
                 results.append(CheckResult.skipped(check_id, spec.title, spec.dimension, "disabled in contract"))

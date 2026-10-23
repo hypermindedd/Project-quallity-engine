@@ -1,4 +1,4 @@
-"""Discovery → draft contract → full run → reports, and the repair loop guard."""
+"""Discovery → generated contract → full run → reports, and the repair loop guard."""
 
 from __future__ import annotations
 
@@ -42,11 +42,10 @@ def test_init_writes_a_contract_that_loads_and_runs(tmp_path, monkeypatch):
     assert main(["init", str(tmp_path)]) == 2  # never overwrites silently
     config = load_config(tmp_path)
     config.pytest.env = {"PYTHONPATH": str(tmp_path / "src")}
+    assert "pqe:generated" in (tmp_path / ".qa/pqe.toml").read_text() and (tmp_path / ".qa/plan.md").exists()
     report = run_pipeline(config, RunOptions(only=["functional", "goals"], out_dir=tmp_path / "out"))
-    assert report["goals"][0]["status"] == "MET"
-    unmapped = next(c for c in report["checks"] if c["check_id"] == "goals.traceability") if config.trace_sources else None
-    assert unmapped is None  # draft adds no trace sources by itself; families become TODO goals instead
-    assert any(g["goal_id"] == "G-REQ" and g["status"] == "UNVERIFIED" for g in report["goals"])
+    goals = {g["goal_id"]: g["status"] for g in report["goals"]}
+    assert goals["U-00"] == "MET"  # the project's own tests, found and run without configuration
     out = tmp_path / "out"
     assert {"report.json", "report.md", "junit.xml", "results.sarif"} <= {p.name for p in out.iterdir()}
     ET.fromstring((out / "junit.xml").read_text())
@@ -148,13 +147,10 @@ def test_notion_page_ticks_met_goals(monkeypatch):
 
 
 def test_setup_that_rewrites_tracked_files_is_reported(tmp_path):
-    _project(tmp_path)
     write(tmp_path, "config.yaml", "store: ${VAR:-default}\n")
-    main(["init", str(tmp_path)])
-    toml = (tmp_path / ".qa/pqe.toml").read_text()
     script = "import pathlib; pathlib.Path('config.yaml').write_text('store: default\\\\n')"
-    toml = f'[[setup]]\nid = "install"\nargv = ["{sys.executable}", "-c", "{script}"]\n\n' + toml
-    (tmp_path / ".qa/pqe.toml").write_text(toml)
+    (tmp_path / ".qa").mkdir()
+    (tmp_path / ".qa/pqe.toml").write_text(f'[[setup]]\nid = "install"\nargv = ["{sys.executable}", "-c", "{script}"]\n\n[project]\nname = "x"\n')
     git(tmp_path, "init", "-q")
     git(tmp_path, "-c", "user.email=t@t", "-c", "user.name=t", "add", "-A")
     git(tmp_path, "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "init")

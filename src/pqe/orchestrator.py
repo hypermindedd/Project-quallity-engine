@@ -35,9 +35,17 @@ class RunOptions:
     setup: bool = False
     publish: bool = False
     fail_on: str = "no_go"  # no_go | conditional
+    target: str = ""  # web | android | ios | windows | "" (all): one CI job per environment
+    prior_results: list[CheckResult] = field(default_factory=list)  # e.g. setup already run by `pqe auto`
+    extra_report: dict[str, Any] = field(default_factory=dict)  # merged into report.json (plan, planner)
+
+#: Runners bound to a device environment; every other runner belongs to the web/Linux job.
+RUNNER_TARGET = {"android": "android", "ios": "ios"}
 
 
 def _selected(runner: type[Runner], options: RunOptions) -> bool:
+    if options.target and RUNNER_TARGET.get(runner.id, "web") != options.target:
+        return False
     keys = {runner.id, runner.dimension.value}
 
     def hit(patterns: list[str]) -> bool:
@@ -66,7 +74,7 @@ def run_setup(ctx: RunContext) -> list[CheckResult]:
     """Run setup commands and verify they are hermetic (no tracked file changes)."""
     results = []
     before = _tracked_changes(ctx)
-    for spec in ctx.config.setup:
+    for spec in [s for s in ctx.config.setup if ctx.in_target(s.target)]:
         if not spec.enabled:
             continue
         proc = ctx.run(spec.argv, cwd=spec.cwd, env=ctx.build_env(spec.env), timeout_s=spec.timeout_s)
@@ -100,9 +108,9 @@ def run_pipeline(config: Config, options: RunOptions) -> dict[str, Any]:
     started = dt.datetime.now(dt.UTC)
     out_dir = options.out_dir or (config.qa_dir / "out" / started.strftime("%Y%m%dT%H%M%SZ"))
     out_dir.mkdir(parents=True, exist_ok=True)
-    ctx = RunContext(config=config, out_dir=out_dir.resolve())
+    ctx = RunContext(config=config, out_dir=out_dir.resolve(), target=options.target)
 
-    results: list[CheckResult] = []
+    results: list[CheckResult] = list(options.prior_results)
     if options.setup:
         results += run_setup(ctx)
     for runner_cls in sorted(REGISTRY, key=lambda r: (r.phase, r.id)):
@@ -113,13 +121,14 @@ def run_pipeline(config: Config, options: RunOptions) -> dict[str, Any]:
         for r in produced:
             log.info("  %s %s — %s", r.status.value, r.check_id, r.summary)
         results += produced
-    if not options.only or any(p in ("goals", "GOAL") for p in options.only):
+    if options.target in ("", "web") and (not options.only or any(p in ("goals", "GOAL") for p in options.only)):
         results.append(traceability(config))
 
     findings = [f for r in results for f in r.findings]
     assign_modules(config, findings)
     lifecycle = mark_lifecycle(findings, load_baseline(config))
-    goals = evaluate_goals(config, results)
+    goals = [g for g in evaluate_goals(config, results)
+             if ctx.in_target(next((x.target for x in config.goals if x.id == g.goal_id), ""))]
     decision = decide(results, goals)
     briefs = write_fix_briefs(config, findings, out_dir) if findings else []
 
@@ -138,6 +147,8 @@ def run_pipeline(config: Config, options: RunOptions) -> dict[str, Any]:
         "lifecycle": lifecycle,
         "checks": [r.to_dict() for r in results],
         "fix_briefs": [p.relative_to(out_dir).as_posix() for p in briefs],
+        "target": options.target or "all",
+        **options.extra_report,
         "totals": {
             "checks": len(results),
             "findings": len(findings),
@@ -169,6 +180,8 @@ def write_outputs(report: dict[str, Any], out_dir: Path, root: Path) -> None:
 
 
 def exit_code(report: dict[str, Any], fail_on: str) -> int:
+    if fail_on == "never":  # report-only mode: findings are published, the job stays green
+        return 0
     decision = Decision(report["decision"]["decision"])
     if fail_on == "conditional" and decision == Decision.CONDITIONAL:
         return 1

@@ -41,6 +41,7 @@ TEXT = {
         "uncal": "این اندازه‌گیری‌ها آستانهٔ تأییدشده ندارند؛ مقدار ثبت شد ولی قبول/رد نشد:",
         "attest": "معیارهایی که منتظر تأیید انسانی‌اند:",
         "unverified_note": "هدفِ بدون شواهدِ اجراشده «تأییدنشده» می‌ماند و هرگز محقق فرض نمی‌شود.",
+        "proposed_note": "🧪 = هدف پیشنهادی هوش مصنوعی از روی مستندات؛ گزارش می‌شود ولی تا تأیید انسان، جلوی انتشار را نمی‌گیرد.",
         "yes": "بله",
         "no": "خیر",
         "meta": "پروژه",
@@ -74,6 +75,7 @@ TEXT = {
         "uncal": "These measurements have no approved threshold; recorded, not judged:",
         "attest": "Criteria waiting for human attestation:",
         "unverified_note": "A goal without executed evidence stays UNVERIFIED; it is never assumed met.",
+        "proposed_note": "🧪 = proposed by the AI planner from the documents; reported, never blocking until a human accepts it.",
         "yes": "yes",
         "no": "no",
         "meta": "Project",
@@ -103,6 +105,10 @@ DIMENSION_FA = {
     "UI_VISUAL": "رابط کاربری: کیفیت بصری",
     "UI_RESPONSIVE": "رابط کاربری: واکنش‌گرایی و جهت متن",
     "ACCESSIBILITY": "دسترس‌پذیری",
+    "WEB_LINKS": "وب‌سایت: لینک‌ها و فایل‌های سالم",
+    "WEB_SEO": "وب‌سایت: سئو و ساختار صفحه",
+    "MOBILE_STABILITY": "اپ موبایل: پایداری (کرش، هنگ، زمان اجرا)",
+    "PLATFORM_SECURITY": "امنیت پیکربندی اپ (مانیفست، مجوزها، ترافیک)",
     "INTEGRITY": "یکپارچگی فایل‌ها",
     "DOCUMENTATION": "سازگاری مستندات",
 }
@@ -133,13 +139,16 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"## 🎯 {t['goals']}",
         "",
         f"> {t['unverified_note']}",
+        ">",
+        f"> {t['proposed_note']}",
         "",
         f"| | ID | {t['goal']} | {t['status']} | {t['gate']} | {t['evidence']} |",
         "|---|---|---|---|---|---|",
     ]
     for g in report["goals"]:
         evidence = "<br>".join(f"{c['kind']}: {_cell(c['detail'])}" for c in g["criteria"])
-        out.append(f"| {GOAL_ICON[g['status']]} | `{g['goal_id']}` | {_cell(g['title'])} | {g['status']} | {t['yes'] if g['hard_gate'] else t['no']} | {evidence} |")
+        title = ("🧪 " if g.get("proposed") else "") + _cell(g['title'])
+        out.append(f"| {GOAL_ICON[g['status']]} | `{g['goal_id']}` | {title} | {g['status']} | {t['yes'] if g['hard_gate'] else t['no']} | {evidence} |")
     out += ["", f"## 🧭 {t['coverage']}", "", f"| | {t['dimension']} | {t['status']} | {t['checks']} |", "|---|---|---|---|"]
     for dim, info in report["coverage"].items():
         label = DIMENSION_FA.get(dim, dim) if lang == "fa" else dim

@@ -51,6 +51,7 @@ class CommandSpec:
     severity: Severity = Severity.SEV1
     requires: list[str] = field(default_factory=list)
     enabled: bool = True
+    target: str = ""  # "" = every environment; else web | android | ios | windows
 
 
 @dataclass
@@ -178,9 +179,30 @@ class Viewport:
 class UiAction:
     """One step of the per-context bootstrap (e.g. a test-account sign-up)."""
 
-    action: str  # goto | click | fill | select | wait_for | wait_ms | press
+    action: str  # see UI_ACTIONS
     selector: str = ""
     value: str = ""
+
+
+UI_ACTIONS = {
+    # interaction
+    "goto", "click", "fill", "select", "press", "wait_for", "wait_ms",
+    # assertions (a failed assertion fails the journey)
+    "expect_text", "expect_visible", "expect_hidden", "expect_url", "expect_title",
+}
+UI_NEEDS_SELECTOR = {"click", "fill", "select", "press", "wait_for", "expect_visible", "expect_hidden"}
+
+
+@dataclass
+class UiJourney:
+    """A goal-level user journey: what a real user does, and what must be true after."""
+
+    id: str
+    title: str
+    steps: list[UiAction]
+    severity: Severity = Severity.SEV1
+    proposed: bool = False  # written by the AI planner; reported, never blocks until a human accepts it
+    source: str = ""
 
 
 @dataclass
@@ -194,6 +216,7 @@ class UiSpec:
     ready_timeout_s: int = 120
     pages: list[str] = field(default_factory=lambda: ["/"])
     actions: list[UiAction] = field(default_factory=list)
+    journeys: list[UiJourney] = field(default_factory=list)
     generate_secrets: list[str] = field(default_factory=list)
     max_pages: int = 25
     max_clicks_per_page: int = 40
@@ -216,6 +239,48 @@ class UiSpec:
             "حذف", "خروج", "پرداخت", "خرید", "پاک",
         ]
     )
+
+
+@dataclass
+class WebSpec:
+    """Website audit over the UI application (no browser needed except Lighthouse)."""
+
+    enabled: bool = False
+    links: bool = True
+    external_links: bool = False
+    seo: bool = True
+    lighthouse: bool = True
+    max_pages: int = 200
+
+
+@dataclass
+class AndroidSpec:
+    enabled: bool = False
+    project_dir: str = "."
+    build_command: list[str] = field(default_factory=list)
+    apk_glob: str = "**/build/outputs/apk/debug/*.apk"
+    package: str = ""
+    manifest: str = ""
+    unit_test_command: list[str] = field(default_factory=list)
+    lint_command: list[str] = field(default_factory=list)
+    instrumented_command: list[str] = field(default_factory=list)
+    monkey_events: int = 5000
+    monkey_throttle_ms: int = 75
+    monkey_seed: int = 42
+    maestro_dir: str = ".maestro"
+    startup_samples: int = 3
+    timeout_s: int = 3600
+
+
+@dataclass
+class IosSpec:
+    enabled: bool = False
+    project_dir: str = "."
+    xcodebuild_args: list[str] = field(default_factory=list)  # e.g. ["-workspace", "App.xcworkspace", "-scheme", "App"]
+    destination: str = "platform=iOS Simulator,name=iPhone 16"
+    run_tests: bool = True
+    plist_glob: str = "**/Info.plist"
+    timeout_s: int = 3600
 
 
 @dataclass
@@ -249,6 +314,8 @@ class Goal:
     source: str = ""
     hard_gate: bool = False
     covers: list[str] = field(default_factory=list)
+    proposed: bool = False  # AI-extracted from documents: evaluated and reported, never a hard gate until accepted
+    target: str = ""  # environment whose checks prove this goal ("" = any)
 
 
 @dataclass
@@ -305,6 +372,9 @@ class Config:
     performance: PerformanceSpec = field(default_factory=PerformanceSpec)
     load: LoadSpec = field(default_factory=LoadSpec)
     ui: UiSpec = field(default_factory=UiSpec)
+    web: WebSpec = field(default_factory=WebSpec)
+    android: AndroidSpec = field(default_factory=AndroidSpec)
+    ios: IosSpec = field(default_factory=IosSpec)
     security: SecuritySpec = field(default_factory=SecuritySpec)
     goals: list[Goal] = field(default_factory=list)
     trace_sources: list[TraceSource] = field(default_factory=list)
@@ -401,6 +471,7 @@ def _command(r: _Reader, default_dimension: Dimension) -> CommandSpec:
         severity=r.enum("severity", Severity, Severity.SEV1),
         requires=r.str_list("requires"),
         enabled=r.get("enabled", bool, True),
+        target=r.get("target", str, ""),
     )
     r.done()
     if not spec.argv:
@@ -437,9 +508,25 @@ def _goal(r: _Reader) -> Goal:
         source=r.get("source", str, ""),
         hard_gate=r.get("hard_gate", bool, False),
         covers=r.str_list("covers"),
+        proposed=r.get("proposed", bool, False),
+        target=r.get("target", str, ""),
     )
+    if goal.proposed and goal.hard_gate:
+        raise ConfigError(f"goal '{goal.id}': a proposed goal cannot be a hard gate until a human accepts it")
     r.done()
     return goal
+
+
+def _ui_action(a: _Reader, where: str) -> UiAction:
+    action = UiAction(a.get("action", str, required=True), a.get("selector", str, ""), a.get("value", str, ""))
+    a.done()
+    if action.action not in UI_ACTIONS:
+        raise ConfigError(f"{where}: unknown action '{action.action}' (allowed: {', '.join(sorted(UI_ACTIONS))})")
+    if action.action in UI_NEEDS_SELECTOR and not action.selector:
+        raise ConfigError(f"{where}: '{action.action}' needs a selector")
+    if action.action in {"expect_text", "expect_url", "expect_title", "goto", "fill"} and not action.value:
+        raise ConfigError(f"{where}: '{action.action}' needs a value")
+    return action
 
 
 def _scenario(r: _Reader) -> Scenario:
@@ -601,20 +688,27 @@ def parse_config(data: dict[str, Any], root: Path) -> Config:
     ld.done()
 
     u = top.sub("ui")
-    actions = []
-    for a in u.subs("actions"):
-        action = UiAction(a.get("action", str, required=True), a.get("selector", str, ""), a.get("value", str, ""))
-        a.done()
-        if action.action not in {"goto", "click", "fill", "select", "wait_for", "wait_ms", "press"}:
-            raise ConfigError(f"ui.actions: unknown action '{action.action}'")
-        if action.action in {"click", "fill", "select", "wait_for", "press"} and not action.selector:
-            raise ConfigError(f"ui.actions: '{action.action}' needs a selector")
-        actions.append(action)
+    actions = [_ui_action(a, "ui.actions") for a in u.subs("actions")]
+    journeys = []
+    for j in u.subs("journeys"):
+        journey = UiJourney(
+            id=j.get("id", str, required=True),
+            title=j.get("title", str, required=True),
+            steps=[_ui_action(a, "ui.journeys.steps") for a in j.subs("steps")],
+            severity=j.enum("severity", Severity, Severity.SEV1),
+            proposed=j.get("proposed", bool, False),
+            source=j.get("source", str, ""),
+        )
+        j.done()
+        if not journey.steps:
+            raise ConfigError(f"ui journey '{journey.id}' has no steps")
+        journeys.append(journey)
     viewports = []
     for v in u.subs("viewports"):
         viewports.append(Viewport(v.get("name", str, required=True), v.get("width", int, required=True), v.get("height", int, required=True)))
         v.done()
     ui = UiSpec(
+        journeys=journeys,
         enabled=u.get("enabled", bool, False),
         base_url=u.get("base_url", str, ""),
         start_command=u.str_list("start_command"),
@@ -639,6 +733,49 @@ def parse_config(data: dict[str, Any], root: Path) -> Config:
     u.done()
     if ui.expect_dir not in {"", "rtl", "ltr"}:
         raise ConfigError("ui.expect_dir must be 'rtl', 'ltr' or empty")
+
+    w = top.sub("web")
+    web = WebSpec(
+        enabled=w.get("enabled", bool, False),
+        links=w.get("links", bool, True),
+        external_links=w.get("external_links", bool, False),
+        seo=w.get("seo", bool, True),
+        lighthouse=w.get("lighthouse", bool, True),
+        max_pages=w.get("max_pages", int, 200),
+    )
+    w.done()
+
+    an = top.sub("android")
+    android = AndroidSpec(
+        enabled=an.get("enabled", bool, False),
+        project_dir=an.get("project_dir", str, "."),
+        build_command=an.str_list("build_command"),
+        apk_glob=an.get("apk_glob", str, AndroidSpec().apk_glob),
+        package=an.get("package", str, ""),
+        manifest=an.get("manifest", str, ""),
+        unit_test_command=an.str_list("unit_test_command"),
+        lint_command=an.str_list("lint_command"),
+        instrumented_command=an.str_list("instrumented_command"),
+        monkey_events=an.get("monkey_events", int, 5000),
+        monkey_throttle_ms=an.get("monkey_throttle_ms", int, 75),
+        monkey_seed=an.get("monkey_seed", int, 42),
+        maestro_dir=an.get("maestro_dir", str, ".maestro"),
+        startup_samples=an.get("startup_samples", int, 3),
+        timeout_s=an.get("timeout_s", int, 3600),
+    )
+    an.done()
+
+    io = top.sub("ios")
+    ios = IosSpec(
+        enabled=io.get("enabled", bool, False),
+        project_dir=io.get("project_dir", str, "."),
+        xcodebuild_args=io.str_list("xcodebuild_args"),
+        destination=io.get("destination", str, IosSpec().destination),
+        run_tests=io.get("run_tests", bool, True),
+        plist_glob=io.get("plist_glob", str, IosSpec().plist_glob),
+        timeout_s=io.get("timeout_s", int, 3600),
+    )
+    io.done()
 
     s = top.sub("security")
     security = SecuritySpec(
@@ -713,6 +850,9 @@ def parse_config(data: dict[str, Any], root: Path) -> Config:
         performance=performance,
         load=load,
         ui=ui,
+        web=web,
+        android=android,
+        ios=ios,
         security=security,
         goals=goals,
         trace_sources=trace_sources,

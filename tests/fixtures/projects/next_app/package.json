@@ -1,0 +1,2 @@
+{ "name": "store", "scripts": { "dev": "next dev", "build": "next build", "lint": "next lint" },
+  "dependencies": { "next": "16.0.0", "react": "19.0.0" } }

@@ -1,7 +1,7 @@
 """Project discovery: what is this project, how is it built, what does it promise?
 
 Discovery is deterministic and read-only. It produces a :class:`ProjectProfile`
-that ``pqe init`` turns into a *draft* contract. Mapping goals to evidence is a
+that the planner turns into a contract. Mapping goals to evidence is a
 reasoning task done with a human (or the Claude Code ``pqe-onboard`` skill),
 because only the project's documents — not its code — can say what "correct"
 means.
