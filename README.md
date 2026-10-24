@@ -55,7 +55,7 @@ on:
   workflow_dispatch:
 jobs:
   quality:
-    uses: hypermindedd/pqe01-project-quality-engine/.github/workflows/pqe.yml@main
+    uses: hypermindedd/Project-quallity-engine/.github/workflows/pqe.yml@main
     with:
       fail-on: no_go
     secrets: inherit

@@ -233,7 +233,7 @@ def render_sarif(report: dict[str, Any], root: Path) -> str:
     sarif = {
         "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
         "version": "2.1.0",
-        "runs": [{"tool": {"driver": {"name": "pqe", "informationUri": "https://github.com/hypermindedd/pqe01-project-quality-engine",
+        "runs": [{"tool": {"driver": {"name": "pqe", "informationUri": "https://github.com/hypermindedd/Project-quallity-engine",
                                       "version": report["engine_version"], "rules": list(rules.values())}},
                   "results": results}],
     }

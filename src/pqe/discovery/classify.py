@@ -58,6 +58,8 @@ WEB_FRAMEWORKS = {
 }
 NODE_API = {"express", "fastify", "@nestjs/core", "koa", "hono", "@hapi/hapi"}
 MAX_FILES = 40_000
+#: Test data and samples are not product components (a repo's fixtures must not be "tested as the app").
+NON_PRODUCT_DIRS = {"fixtures", "__fixtures__", "testdata", "test-data", "__mocks__", "examples", "example", "samples"}
 
 
 @dataclass
@@ -123,7 +125,8 @@ class Inventory:
         self.dirs: set[str] = set()
         count = 0
         for dirpath, dirnames, filenames in os.walk(root):
-            dirnames[:] = sorted(d for d in dirnames if d not in ALWAYS_EXCLUDED_DIRS and (not d.startswith(".") or d in {".github", ".maestro"}))
+            dirnames[:] = sorted(d for d in dirnames if d not in ALWAYS_EXCLUDED_DIRS and d not in NON_PRODUCT_DIRS
+                                 and (not d.startswith(".") or d in {".github", ".maestro"}))
             rel_dir = os.path.relpath(dirpath, root)
             rel_dir = "" if rel_dir == "." else rel_dir.replace(os.sep, "/")
             for d in dirnames:

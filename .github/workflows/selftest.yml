@@ -1,0 +1,28 @@
+# End-to-end proof on real GitHub runners: the shared workflow, run exactly as a
+# project would run it, against sample projects the engine has never seen.
+name: Engine self-test on sample projects
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  static-site:
+    uses: ./.github/workflows/pqe.yml
+    with:
+      path: tests/fixtures/projects/static_site
+      report-name: static-site
+      ai: false
+      fail-on: never
+  api-service:
+    uses: ./.github/workflows/pqe.yml
+    with:
+      path: tests/fixtures/projects/fastapi_service
+      report-name: api-service
+      ai: false
+      fail-on: never

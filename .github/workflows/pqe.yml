@@ -1,15 +1,24 @@
-# Reusable workflow: any repository of the same owner calls it with ~10 lines
-# (see templates/project-workflow.yml). It classifies the project and fans out
-# to one job per environment the project actually needs.
+# Reusable workflow: any repository of the same owner calls it with ~12 lines
+# (templates/project-workflow.yml). It classifies the project and fans out to
+# one job per environment the project actually needs.
 name: PQE quality run
 
 on:
   workflow_call:
     inputs:
+      path:
+        description: Project directory inside the repository
+        type: string
+        default: "."
+      report-name:
+        description: Suffix for artifact names (needed when one workflow calls this more than once)
+        type: string
+        default: project
       ai:
         type: boolean
         default: true
       fail-on:
+        description: "no_go | conditional | never (report only)"
         type: string
         default: no_go
       android-api-level:
@@ -39,9 +48,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: pqe
-        uses: hypermindedd/pqe01-project-quality-engine@main
+        uses: hypermindedd/Project-quallity-engine@main
         with:
           mode: classify
+          path: ${{ inputs.path }}
 
   web:
     needs: classify
@@ -54,11 +64,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - uses: hypermindedd/pqe01-project-quality-engine@main
+      - uses: hypermindedd/Project-quallity-engine@main
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         with:
+          path: ${{ inputs.path }}
           target: web
           ai: ${{ inputs.ai }}
           fail-on: ${{ inputs.fail-on }}
@@ -66,18 +77,20 @@ jobs:
       - if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pqe-report-web
+          name: pqe-web-${{ inputs.report-name }}
           path: |
             pqe-report-web/
-            .qa/pqe.toml
-            .qa/plan.md
-            .qa/planner.json
-            .qa/classification.json
-      - if: always() && hashFiles('pqe-report-web/results.sarif') != ''
+            ${{ inputs.path }}/.qa/pqe.toml
+            ${{ inputs.path }}/.qa/plan.md
+            ${{ inputs.path }}/.qa/planner.json
+            ${{ inputs.path }}/.qa/classification.json
+      - name: Upload findings to code scanning (needs GitHub code security on private repos)
+        if: always() && hashFiles('pqe-report-web/results.sarif') != ''
+        continue-on-error: true
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: pqe-report-web/results.sarif
-          category: pqe-web
+          category: pqe-web-${{ inputs.report-name }}
 
   android:
     needs: classify
@@ -102,7 +115,7 @@ jobs:
         run: |
           curl -fsSL "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
-      - uses: hypermindedd/pqe01-project-quality-engine@main
+      - uses: hypermindedd/Project-quallity-engine@main
         with:
           mode: install
       - name: Enable KVM (hardware-accelerated emulator)
@@ -119,11 +132,11 @@ jobs:
           target: google_apis
           arch: x86_64
           disable-animations: true
-          script: pqe auto . --target android --no-ai --out pqe-report-android --fail-on ${{ inputs.fail-on }}
+          script: pqe auto "${{ inputs.path }}" --target android --no-ai --out pqe-report-android --fail-on ${{ inputs.fail-on }}
       - if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pqe-report-android
+          name: pqe-android-${{ inputs.report-name }}
           path: pqe-report-android/
 
   ios:
@@ -133,8 +146,9 @@ jobs:
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
-      - uses: hypermindedd/pqe01-project-quality-engine@main
+      - uses: hypermindedd/Project-quallity-engine@main
         with:
+          path: ${{ inputs.path }}
           target: ios
           ai: false
           fail-on: ${{ inputs.fail-on }}
@@ -142,7 +156,7 @@ jobs:
       - if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pqe-report-ios
+          name: pqe-ios-${{ inputs.report-name }}
           path: pqe-report-ios/
 
   windows-note:

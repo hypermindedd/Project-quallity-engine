@@ -2,10 +2,9 @@
 # The engine detects what the project is (site, web app, API, Android, iOS, Flutter,
 # React Native, CLI, library, …), designs the tests, runs them and reports.
 #
-# One-time setup in the ENGINE repository (hypermindedd/pqe01-project-quality-engine):
-#   Settings → Actions → General → Access → "Accessible from repositories owned by the user".
-# Optional secrets in the PROJECT repository: ANTHROPIC_API_KEY (AI test designer and
-# visual review), NOTION_TOKEN (command-room report).
+# Optional secrets in the PROJECT repository:
+#   ANTHROPIC_API_KEY  AI test designer (goals and journeys from your documents) + visual review
+#   NOTION_TOKEN       command-room report
 name: Project Quality Engine
 
 on:
@@ -14,9 +13,13 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   quality:
-    uses: hypermindedd/pqe01-project-quality-engine/.github/workflows/pqe.yml@main
+    uses: hypermindedd/Project-quallity-engine/.github/workflows/pqe.yml@main
     with:
-      fail-on: no_go   # use "never" for report-only while the project is young
+      fail-on: never   # report only while the project is young; switch to no_go to block bad releases
     secrets: inherit
