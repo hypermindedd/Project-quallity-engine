@@ -16,7 +16,7 @@ from . import runners as _runners  # noqa: F401 - registers built-in runners
 from .analysis.goals import coverage_matrix, evaluate_goals, traceability
 from .analysis.triage import assign_modules, decide, load_baseline, mark_lifecycle, write_fix_briefs
 from .config import Config
-from .context import RunContext
+from .context import RunContext, ToolMissing
 from .model import CheckResult, Decision, Dimension, Finding, Location, Severity, Status
 from .report import notion
 from .report.render import render_junit, render_markdown, render_sarif
@@ -77,7 +77,19 @@ def run_setup(ctx: RunContext) -> list[CheckResult]:
     for spec in [s for s in ctx.config.setup if ctx.in_target(s.target)]:
         if not spec.enabled:
             continue
-        proc = ctx.run(spec.argv, cwd=spec.cwd, env=ctx.build_env(spec.env), timeout_s=spec.timeout_s)
+        try:
+            proc = ctx.run(spec.argv, cwd=spec.cwd, env=ctx.build_env(spec.env), timeout_s=spec.timeout_s)
+        except (ToolMissing, OSError) as exc:
+            # A missing tool must never crash the run: report it and let every independent check proceed.
+            missing = isinstance(exc, ToolMissing)
+            result = CheckResult(f"setup.{spec.id}", spec.title, Dimension.BUILD, Status.SKIPPED if missing else Status.ERROR,
+                                 summary=f"required tool not installed: {exc}" if missing else f"cannot execute: {exc}")
+            result.findings.append(Finding(result.check_id, Dimension.BUILD, Severity.SEV2,
+                                           f"Setup step could not run ({'missing tool' if missing else 'error'}): {spec.title}",
+                                           detail=str(exc), evidence={"key": f"setup:{spec.id}"},
+                                           suggestion="Checks that depend on this setup will be skipped; install the tool in the runner or adjust the setup command."))
+            results.append(result)
+            continue
         log_name = f"setup-{spec.id}.log"
         (ctx.out_dir / log_name).write_text(ctx.redact(proc.stdout + "\n" + proc.stderr), encoding="utf-8")
         status = Status.PASS if proc.ok else Status.ERROR

@@ -167,10 +167,12 @@ def _join(base: str, rel: str) -> str:
 
 
 def _node_install(inv: Inventory, folder: str) -> list[str]:
+    # corepack ships with Node and fetches the exact pnpm/yarn version the project pins (packageManager),
+    # so CI runners need nothing preinstalled.
     if _join(folder, "pnpm-lock.yaml") in inv.files:
-        return ["pnpm", "install", "--frozen-lockfile"]
+        return ["corepack", "pnpm", "install", "--frozen-lockfile"]
     if _join(folder, "yarn.lock") in inv.files:
-        return ["yarn", "install", "--frozen-lockfile"]
+        return ["corepack", "yarn", "install", "--frozen-lockfile"]
     if _join(folder, "package-lock.json") in inv.files:
         return ["npm", "ci"]
     return ["npm", "install"]

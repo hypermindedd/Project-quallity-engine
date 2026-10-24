@@ -351,6 +351,8 @@ class NodeAuditRunner(Runner):
             else:
                 skipped.append(f"{rel}: no lockfile")
                 continue
+            if not ctx.which(tool[0]) and tool[0] in {"pnpm", "yarn"} and ctx.which("corepack"):
+                tool = ["corepack", *tool]  # same pinned package manager the project uses, nothing preinstalled
             if not ctx.which(tool[0]):
                 skipped.append(f"{rel}: {tool[0]} not installed")
                 continue
@@ -362,7 +364,7 @@ class NodeAuditRunner(Runner):
                 continue
             for name, ident, severity, title in parse_node_audit(data):
                 result.findings.append(
-                    Finding(self.id, self.dimension, severity, f"{name}: {title}"[:200], location=Location(f"{rel}/{'pnpm-lock.yaml' if tool[0] == 'pnpm' else 'package-lock.json'}"),
+                    Finding(self.id, self.dimension, severity, f"{name}: {title}"[:200], location=Location(f"{rel}/{'pnpm-lock.yaml' if 'pnpm' in tool else 'package-lock.json'}"),
                             evidence={"key": f"{rel}:{name}:{ident}"}, suggestion="Upgrade or override the affected package and re-run the audit.")
                 )
         if skipped and not result.findings and len(skipped) == len(ctx.config.security.npm_audit_dirs):

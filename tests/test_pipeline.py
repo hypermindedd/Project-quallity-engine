@@ -158,3 +158,13 @@ def test_setup_that_rewrites_tracked_files_is_reported(tmp_path):
     hermetic = next(c for c in report["checks"] if c["check_id"] == "setup.hermetic")
     assert hermetic["status"] == "FAIL"
     assert hermetic["findings"][0]["title"] == "Setup modified a tracked file: config.yaml"
+
+
+def test_missing_setup_tool_is_reported_not_fatal(tmp_path):
+    (tmp_path / ".qa").mkdir()
+    (tmp_path / ".qa/pqe.toml").write_text('[[setup]]\nid = "web"\nargv = ["pqe-no-such-tool", "install"]\n\n[project]\nname = "x"\n')
+    report = run_pipeline(load_config(tmp_path), RunOptions(only=["security.secrets"], setup=True, out_dir=tmp_path / "o"))
+    checks = {c["check_id"]: c for c in report["checks"]}
+    assert checks["setup.web"]["status"] == "SKIPPED"
+    assert checks["setup.web"]["findings"][0]["severity"] == "SEV2"
+    assert checks["security.secrets"]["status"] == "PASS"  # independent checks still ran

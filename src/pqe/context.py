@@ -109,6 +109,7 @@ class RunContext:
         # Bytecode caches are keyed by mtime (1s) + size; an edit of equal size within
         # the same second (exactly what an automated fixer does) would run stale code.
         env.setdefault("PYTHONDONTWRITEBYTECODE", "1")
+        env.setdefault("COREPACK_ENABLE_DOWNLOAD_PROMPT", "0")  # never wait for a y/N prompt in CI
         env.update(self.secrets)
         for key, value in overrides.items():
             env[key] = self.interpolate(value, extra)
