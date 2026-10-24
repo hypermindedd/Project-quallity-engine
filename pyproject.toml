@@ -16,7 +16,7 @@ dependencies = []
 security = ["bandit>=1.8", "pip-audit>=2.9", "ruff>=0.14"]
 ui = ["playwright>=1.55", "pillow>=11"]
 all = ["pqe[security,ui]", "semgrep>=1.140"]
-dev = ["pytest>=8", "ruff>=0.14"]
+dev = ["pytest>=8", "ruff>=0.14", "fastapi>=0.115", "uvicorn>=0.30", "httpx>=0.27"]  # fastapi/uvicorn: sample API project in tests
 
 [project.scripts]
 pqe = "pqe.cli:main"
