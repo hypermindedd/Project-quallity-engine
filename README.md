@@ -48,16 +48,22 @@ Settings → Actions → General → Access → Accessible from repositories own
 
 ```yaml
 name: Project Quality Engine
+
 on:
   push:
     branches: [main]
   pull_request:
   workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   quality:
     uses: hypermindedd/Project-quallity-engine/.github/workflows/pqe.yml@main
     with:
-      fail-on: no_go
+      fail-on: never   # report only while the project is young; switch to no_go to block bad releases
     secrets: inherit
 ```
 
