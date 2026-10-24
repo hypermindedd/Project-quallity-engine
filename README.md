@@ -38,13 +38,19 @@ Settings → Actions → General → Access → Accessible from repositories own
 
 <div dir="rtl">
 
-بعد در هر پروژه، فقط این فایل را اضافه کن:
+بعد در **ریپوی هر پروژه** (نه این ریپو) یک فایل تازه بساز. اسم و مسیر فایل:
 
 </div>
 
 ```text
 .github/workflows/pqe.yml
 ```
+
+<div dir="rtl">
+
+و محتوای آن فایل دقیقاً این متن است:
+
+</div>
 
 ```yaml
 name: Project Quality Engine
@@ -63,13 +69,13 @@ jobs:
   quality:
     uses: hypermindedd/Project-quallity-engine/.github/workflows/pqe.yml@main
     with:
-      fail-on: never   # report only while the project is young; switch to no_go to block bad releases
+      fail-on: never
     secrets: inherit
 ```
 
 <div dir="rtl">
 
-رازهای اختیاری پروژه: کلید هوش مصنوعی برای طراحی آزمون از روی مستندات و بازبینی تصویری، و توکن نوشن برای گزارش در اتاق فرمان. نام رازها:
+رازهای اختیاری، **در تنظیمات ریپوی همان پروژه** (نه این ریپو): کلید هوش مصنوعی برای طراحی آزمون از روی مستندات و بازبینی تصویری، و توکن نوشن برای گزارش در اتاق فرمان. نام رازها:
 
 </div>
 
