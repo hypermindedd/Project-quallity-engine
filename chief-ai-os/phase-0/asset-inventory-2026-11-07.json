@@ -1,0 +1,3042 @@
+{
+  "schema": "chief.asset-inventory/v0.1",
+  "collected_at_date": "2026-11-07",
+  "collector": "CHIEF AI read-only GitHub connector",
+  "note": "Git tree entries include tree objects (directories), not just executable files; empty repository state is distinct from zero-size repo metadata. No code execution is asserted.",
+  "repositories": [
+    {
+      "repository": "hypermindedd/pti01-personal-trading-intelligence-os",
+      "visibility": "private",
+      "default_branch": "main",
+      "head_sha": "cf101deacf2e185aa4d1fb6d6b6c1188528cd911",
+      "tree_truncated": false,
+      "tree_entries": [
+        {
+          "path": ".editorconfig",
+          "type": "blob",
+          "mode": "100644",
+          "size": 184,
+          "sha": "520807bead76ffd427c6c4494a0e0431e2b99da9"
+        },
+        {
+          "path": ".github",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "8f6a79870bbfd688b1d583f0125211b646903f5a"
+        },
+        {
+          "path": ".github/pull_request_template.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 393,
+          "sha": "e02a1b0c187a95209d0177ab57d5602a83eea60b"
+        },
+        {
+          "path": ".github/workflows",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": ".github/workflows/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": ".gitignore",
+          "type": "blob",
+          "mode": "100644",
+          "size": 393,
+          "sha": "3103b7b25a6f02894037fd5194a2206fff99efdd"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 503,
+          "sha": "6a300b0b08fe0bc1327d37cd3b8a19e7593c4175"
+        },
+        {
+          "path": "README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1743,
+          "sha": "84eac893565f7f5ffd861d630b25aa49067b7c4d"
+        },
+        {
+          "path": "SECURITY.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 571,
+          "sha": "c0305de8f8ff5d1ec6760fe2e9baa77fa1bd7490"
+        },
+        {
+          "path": "config",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "a38b17789ff7a4d931168b28ef08e18ac1ddb91a"
+        },
+        {
+          "path": "config/examples",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "config/examples/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "docs",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "ad6f0161b645857ccfeed4814af70da9e724fcaa"
+        },
+        {
+          "path": "docs/adr",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "b3d659d7b9cfd0cda173fc3be11d08385031b393"
+        },
+        {
+          "path": "docs/adr/README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 186,
+          "sha": "ce10fa0901db46abfc2fa652611a2250c2da69e8"
+        },
+        {
+          "path": "docs/architecture",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "a4b62581762518f3f60ab9a95a2a93709c4934d8"
+        },
+        {
+          "path": "docs/architecture/README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 295,
+          "sha": "c41cb585917dbcedc55d5b3563adc4c1c4a35d21"
+        },
+        {
+          "path": "docs/contracts",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "a05127bcd4ed7f7c014349ef50a51d34a7af76f2"
+        },
+        {
+          "path": "docs/contracts/README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 188,
+          "sha": "5b3660f9efe8b284df1c3d320f128fc4e623de1b"
+        },
+        {
+          "path": "docs/gates",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "966627c35a8154a6b19f90198179aa11b08b0381"
+        },
+        {
+          "path": "docs/gates/README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 193,
+          "sha": "ce4af00f005eb98ed96d6703adfef78360d724c9"
+        },
+        {
+          "path": "docs/research",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "1ad0fe26eb9cf05fa3aba8057ef3c21d7d770d5e"
+        },
+        {
+          "path": "docs/research/README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 153,
+          "sha": "d546b5e8217efa3478ed703e7bc8d0eb5226d083"
+        },
+        {
+          "path": "evidence",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d942bf65f7bf0511bba1daa2d471c1d1fe9d2e71"
+        },
+        {
+          "path": "evidence/README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 365,
+          "sha": "841e662488a8ad15a361579542c6334337bafc49"
+        },
+        {
+          "path": "mql5",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "b1b3908cdccb221479cc12c969e83ec4ac07ae09"
+        },
+        {
+          "path": "mql5/Experts",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "72e176ed3138e7fe4faf2a63432bb8fc594b727b"
+        },
+        {
+          "path": "mql5/Experts/PTI01",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "mql5/Experts/PTI01/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "mql5/Include",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "72e176ed3138e7fe4faf2a63432bb8fc594b727b"
+        },
+        {
+          "path": "mql5/Include/PTI01",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "mql5/Include/PTI01/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "mql5/Tests",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "mql5/Tests/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "pyproject.toml",
+          "type": "blob",
+          "mode": "100644",
+          "size": 346,
+          "sha": "b501a3020270ca211934f47458dda1ca295db64b"
+        },
+        {
+          "path": "python",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "657188e0295634585e3b684b2284cdfe447f60fe"
+        },
+        {
+          "path": "python/pti01",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "5a454149479b96d8b9085c203920d6c5b2779b48"
+        },
+        {
+          "path": "python/pti01/__init__.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 98,
+          "sha": "b3d240225ef4d9113d5b5e919c1d2bd08523f0c6"
+        },
+        {
+          "path": "python/pti01/cli",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "python/pti01/cli/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "python/pti01/discovery",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "python/pti01/discovery/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "python/pti01/features",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "python/pti01/features/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "python/pti01/forensics",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "python/pti01/forensics/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "python/pti01/ingestion",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "python/pti01/ingestion/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "python/pti01/microstructure",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "python/pti01/microstructure/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "python/pti01/replay",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "python/pti01/replay/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "python/pti01/storage",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "python/pti01/storage/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "python/pti01/validation",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "python/pti01/validation/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "schemas",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "0d845bae65b7b42e17dce79ab599732f0069965a"
+        },
+        {
+          "path": "schemas/events",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "schemas/events/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "schemas/models",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "schemas/models/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "schemas/objects",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "schemas/objects/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "schemas/snapshots",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "schemas/snapshots/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "schemas/ticks",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "schemas/ticks/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "schemas/trades",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "schemas/trades/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "scripts",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "scripts/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "tests",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "4376ed812920cfccf02077c02bb1eeedae36962a"
+        },
+        {
+          "path": "tests/fixtures",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "tests/fixtures/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "tests/integration",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "tests/integration/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "tests/replay",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "tests/replay/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "tests/unit",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e"
+        },
+        {
+          "path": "tests/unit/.gitkeep",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        }
+      ],
+      "status": "TREE_FETCHED"
+    },
+    {
+      "repository": "hypermindedd/Project-quallity-engine",
+      "visibility": "private",
+      "default_branch": "main",
+      "head_sha": "67f3693c5ca3593a1a1eb52f3de54aac40be1cb2",
+      "tree_truncated": false,
+      "tree_entries": [
+        {
+          "path": ".claude-plugin",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "55865a0477dd6c0aa04391a2d13b7cc6fc444264"
+        },
+        {
+          "path": ".claude-plugin/marketplace.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 305,
+          "sha": "2b2440e0542a4b1182dd399328cfb2a400b3fd71"
+        },
+        {
+          "path": ".github",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "fc49f7cbdb4623e2e54a54b9533ce563d1d07b4e"
+        },
+        {
+          "path": ".github/workflows",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "86cce2ae01ab0952b94f6cb3fc8927e6d529d58b"
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1074,
+          "sha": "12331d6d3f8733147aaed929d483dac6161fb476"
+        },
+        {
+          "path": ".github/workflows/pqe.yml",
+          "type": "blob",
+          "mode": "100644",
+          "size": 5373,
+          "sha": "c14b3b3a440fd2cfbd6c83af2ecc5be7e472f45f"
+        },
+        {
+          "path": ".github/workflows/selftest.yml",
+          "type": "blob",
+          "mode": "100644",
+          "size": 678,
+          "sha": "09cb6cfa8bb3b559417870065a4d811a4793cb10"
+        },
+        {
+          "path": ".gitignore",
+          "type": "blob",
+          "mode": "100644",
+          "size": 60,
+          "sha": "cc12741a06bfdbc074246025fc2eb36bf6683e17"
+        },
+        {
+          "path": ".qa",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "0c615153fa6fb353264a6bcaeda5873d353de4ac"
+        },
+        {
+          "path": ".qa/.gitignore",
+          "type": "blob",
+          "mode": "100644",
+          "size": 5,
+          "sha": "89f9ac04aac6c8ee66e158853e7d0439b3ec782d"
+        },
+        {
+          "path": ".qa/pqe.toml",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1222,
+          "sha": "9aea0c7d0f37c16e846d8f1f71ba595afde93c9d"
+        },
+        {
+          "path": "Dockerfile",
+          "type": "blob",
+          "mode": "100644",
+          "size": 579,
+          "sha": "b1e3fdf5ab8856f8a54b999d00f1305a67de7447"
+        },
+        {
+          "path": "LICENSE",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1062,
+          "sha": "0933487e572e3972ceb8531b81e3fd7bb0c52121"
+        },
+        {
+          "path": "README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 7188,
+          "sha": "6a8e5318e8d6d8534d5d575a15b23e2c47628973"
+        },
+        {
+          "path": "action.yml",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2478,
+          "sha": "5ddd747f47769f8ca7100a28328ddd4d5b18c338"
+        },
+        {
+          "path": "plugin",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "f2649f83583c42b15817379dcec4ea8c74b18557"
+        },
+        {
+          "path": "plugin/.claude-plugin",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "176109e4d1b7e5255281730978ea84d4b7df3c68"
+        },
+        {
+          "path": "plugin/.claude-plugin/plugin.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 451,
+          "sha": "94246c13dfd87ef8f3d1fb07a0e8f4bb88c4f477"
+        },
+        {
+          "path": "plugin/agents",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "869fecae44db490995a51f42fec123be2acc0725"
+        },
+        {
+          "path": "plugin/agents/pqe-auditor.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1002,
+          "sha": "1496560589fcadd905e90ad936db078f52b7a3af"
+        },
+        {
+          "path": "plugin/agents/pqe-test-architect.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 734,
+          "sha": "b45babfdea2ac7ac5d19d0b928d69bf5bb7ac59d"
+        },
+        {
+          "path": "plugin/skills",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "94f38485dfee45c3f11a64b9a4db885506b09098"
+        },
+        {
+          "path": "plugin/skills/pqe-fix",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "eaf178370612da4708262d9e1c14dc31bc6f83fe"
+        },
+        {
+          "path": "plugin/skills/pqe-fix/SKILL.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 860,
+          "sha": "89b4e46ba3579424a820873ba00be50f253d4d61"
+        },
+        {
+          "path": "plugin/skills/pqe-onboard",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "ecb62cbbe4168835d35a06ec38402e2da20367d7"
+        },
+        {
+          "path": "plugin/skills/pqe-onboard/SKILL.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1902,
+          "sha": "4b0880649474007762464888b73cf6433429735f"
+        },
+        {
+          "path": "plugin/skills/pqe-run",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "5f4baec52744b999fc737f79869dc33b437871da"
+        },
+        {
+          "path": "plugin/skills/pqe-run/SKILL.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 883,
+          "sha": "cf8d4eb8e9c871082336dcecedc96f1158a96241"
+        },
+        {
+          "path": "pyproject.toml",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1179,
+          "sha": "6d5cde4be18d087969defb181d5a485fd4b37300"
+        },
+        {
+          "path": "src",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "ff76710f1d1756efe86742529df831fcc7edd002"
+        },
+        {
+          "path": "src/pqe",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "b333f6284eb4be9b882bad262e9903ae38faf268"
+        },
+        {
+          "path": "src/pqe/__init__.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 143,
+          "sha": "f78e0ce553766acc45c58f278617e7c3a87763f1"
+        },
+        {
+          "path": "src/pqe/analysis",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "165f4d1c20a37b3d0087ba6838cec2392227a297"
+        },
+        {
+          "path": "src/pqe/analysis/__init__.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 23,
+          "sha": "53fe4f9ee4c56185fb62ca6f9a71ace70d673977"
+        },
+        {
+          "path": "src/pqe/analysis/goals.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 7741,
+          "sha": "923b41627e8c22301fcc2480a79e3925e3b4394d"
+        },
+        {
+          "path": "src/pqe/analysis/llm.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 3965,
+          "sha": "2d101a84da9740308e7a68bdbf45f9add35acfb6"
+        },
+        {
+          "path": "src/pqe/analysis/triage.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 6123,
+          "sha": "a350739eb487805e62cdfdd2b46804e7525a4a1b"
+        },
+        {
+          "path": "src/pqe/cli.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 11260,
+          "sha": "da445aa52177be68a66ce1dc8d55a94c44eb113a"
+        },
+        {
+          "path": "src/pqe/config.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 30821,
+          "sha": "1db5723001960405e93297ba687e5eaba4921c0d"
+        },
+        {
+          "path": "src/pqe/context.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 7749,
+          "sha": "31f67f1216fd41f554035410db34243c297294e2"
+        },
+        {
+          "path": "src/pqe/discovery",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "368ff3fb8ec37d90c40db3b09a97667d9bdd3212"
+        },
+        {
+          "path": "src/pqe/discovery/__init__.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 23,
+          "sha": "53fe4f9ee4c56185fb62ca6f9a71ace70d673977"
+        },
+        {
+          "path": "src/pqe/discovery/classify.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 23798,
+          "sha": "91d942b80fb9f9a718c1859f8954b33558a96a44"
+        },
+        {
+          "path": "src/pqe/discovery/profile.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 7879,
+          "sha": "5f3d6484dc2fd4ecaab5de4cccee0bc281b40b68"
+        },
+        {
+          "path": "src/pqe/http.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 7303,
+          "sha": "65052c714044cd89d8d0ac85e04806a26bf202a0"
+        },
+        {
+          "path": "src/pqe/model.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 6429,
+          "sha": "0bd47a7ab33a8b2650fcae0ed9f2241829e05f07"
+        },
+        {
+          "path": "src/pqe/orchestrator.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 9706,
+          "sha": "fd2dddbb491dd0e083c8d5dbc54d378f3a4c49a9"
+        },
+        {
+          "path": "src/pqe/planning",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "916f3475e4f55ba12acce63e8921563b068691c1"
+        },
+        {
+          "path": "src/pqe/planning/__init__.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 73,
+          "sha": "84c4373359248fa5ec56f0de77ac476c3d01b0a8"
+        },
+        {
+          "path": "src/pqe/planning/ai.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 13870,
+          "sha": "b3b42d035b217b48f7d87f74b8575c1b724e98d1"
+        },
+        {
+          "path": "src/pqe/planning/auto.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 8088,
+          "sha": "126a3647d154f24a96d75ce14630c7e9f6251e80"
+        },
+        {
+          "path": "src/pqe/planning/generate.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 37681,
+          "sha": "4273b0e1eaa64cc408230d7ce7c6169d2b615e96"
+        },
+        {
+          "path": "src/pqe/planning/tomlw.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2598,
+          "sha": "88de4da14a735d4a2011c0306751730aeabb50f7"
+        },
+        {
+          "path": "src/pqe/remediation",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "29a13ed0c0dc7f098a9bba38549f04715a641f26"
+        },
+        {
+          "path": "src/pqe/remediation/__init__.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 23,
+          "sha": "53fe4f9ee4c56185fb62ca6f9a71ace70d673977"
+        },
+        {
+          "path": "src/pqe/remediation/loop.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 5993,
+          "sha": "9dbc533ceb34377655c1a2f786df7963dcb2f97d"
+        },
+        {
+          "path": "src/pqe/report",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "e28b7552b8b63b279359d8076b00f644d661170b"
+        },
+        {
+          "path": "src/pqe/report/__init__.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 23,
+          "sha": "53fe4f9ee4c56185fb62ca6f9a71ace70d673977"
+        },
+        {
+          "path": "src/pqe/report/notion.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 3551,
+          "sha": "d060b4274893313ceeb2d53fb729fc80fda2b5bc"
+        },
+        {
+          "path": "src/pqe/report/render.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 12396,
+          "sha": "10893fb9ea36181d1b046a15d47d4996fa9142ad"
+        },
+        {
+          "path": "src/pqe/runners",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "f7b0baf56e4cda76bce0273635f449572b74a576"
+        },
+        {
+          "path": "src/pqe/runners/__init__.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 176,
+          "sha": "3ef2c80d63f12d45079728a8bb90bc1be3d0a7e1"
+        },
+        {
+          "path": "src/pqe/runners/api.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 27841,
+          "sha": "21e9d911f9dc1893d59b92303bfd13b339d2922a"
+        },
+        {
+          "path": "src/pqe/runners/architecture.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 11291,
+          "sha": "019f19797e6ffc492f7700eb2ac75771716ca3c0"
+        },
+        {
+          "path": "src/pqe/runners/base.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2459,
+          "sha": "f665bfd1360d2cbbfc173adbcfe0d408db7857fb"
+        },
+        {
+          "path": "src/pqe/runners/functional.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 7970,
+          "sha": "3009f074f3c457425c845978fa6b8c3ecb2258e7"
+        },
+        {
+          "path": "src/pqe/runners/integrity.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 7505,
+          "sha": "d7d2b2794f0e3bdbfeb4bd0df86033bb1a8f5d10"
+        },
+        {
+          "path": "src/pqe/runners/mobile.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 26568,
+          "sha": "31ee0b0330e2670c088d93ccca34b8c6b1a9c5a3"
+        },
+        {
+          "path": "src/pqe/runners/quality.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2294,
+          "sha": "a802cf7328dad367e129d2a3ce9e8ab1795657cf"
+        },
+        {
+          "path": "src/pqe/runners/security.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 18321,
+          "sha": "977fc04a4b32ae2f65cce1964d6607e2896cd8b1"
+        },
+        {
+          "path": "src/pqe/runners/ui.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 29989,
+          "sha": "18a7a7a5c8a64d8b832308fb23c04b9cf73ff255"
+        },
+        {
+          "path": "src/pqe/runners/web.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 13623,
+          "sha": "83d0c7afe511dae06cbc2d9d0f8e68d801302c57"
+        },
+        {
+          "path": "src/pqe/tools.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1164,
+          "sha": "cf17bd4d3b815232c33b18b54c11f65a9df226fa"
+        },
+        {
+          "path": "templates",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "b6b7ae4d8db6e580ce944b2cc2197f8d7afe19aa"
+        },
+        {
+          "path": "templates/project-workflow.yml",
+          "type": "blob",
+          "mode": "100644",
+          "size": 817,
+          "sha": "38e07a3db55172d7f24a259cef91b0eb9f3d8a36"
+        },
+        {
+          "path": "tests",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "e292add9ff2da0e12893359367640580142d16ba"
+        },
+        {
+          "path": "tests/__init__.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "tests/conftest.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1093,
+          "sha": "032fae6f34acae9516c6709e2f2d70e0e1975e4c"
+        },
+        {
+          "path": "tests/fixtures",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "2302aa7763c31a59367e92dc10de7ead0ce1116c"
+        },
+        {
+          "path": "tests/fixtures/projects",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "4aad1b0fea14d33353de05b56452646da5315517"
+        },
+        {
+          "path": "tests/fixtures/projects/android_app",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "f857d3e1d2f5c041c43e3ec1fd2ff18f769bcd74"
+        },
+        {
+          "path": "tests/fixtures/projects/android_app/app",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "7fd9cbcec3c92557d65bd8daa09ec95ae63ba937"
+        },
+        {
+          "path": "tests/fixtures/projects/android_app/app/build.gradle",
+          "type": "blob",
+          "mode": "100644",
+          "size": 168,
+          "sha": "95807311e4b21071ed964f01db7a08c849bc592a"
+        },
+        {
+          "path": "tests/fixtures/projects/android_app/app/src",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "0da6a2fb7aa641e5984f07d69932a8afd5eec0a8"
+        },
+        {
+          "path": "tests/fixtures/projects/android_app/app/src/main",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "bb39a7e1e302debee6ce24e1be3a1434f1d895b7"
+        },
+        {
+          "path": "tests/fixtures/projects/android_app/app/src/main/AndroidManifest.xml",
+          "type": "blob",
+          "mode": "100644",
+          "size": 775,
+          "sha": "565565aedbebc7d5769353970e318c9033a776e1"
+        },
+        {
+          "path": "tests/fixtures/projects/android_app/gradlew",
+          "type": "blob",
+          "mode": "100755",
+          "size": 35,
+          "sha": "6d6a9ac311357356154023184ce9115d8844787d"
+        },
+        {
+          "path": "tests/fixtures/projects/android_app/settings.gradle",
+          "type": "blob",
+          "mode": "100644",
+          "size": 42,
+          "sha": "6d73e9657b5aaabe55d6fc787600d03d81ced868"
+        },
+        {
+          "path": "tests/fixtures/projects/fastapi_service",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d8b14250bd384db5a9794ae50b99bceecfeaf46f"
+        },
+        {
+          "path": "tests/fixtures/projects/fastapi_service/README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 169,
+          "sha": "586f7ba91c504bfefaa22e08da509296d150b5dd"
+        },
+        {
+          "path": "tests/fixtures/projects/fastapi_service/pyproject.toml",
+          "type": "blob",
+          "mode": "100644",
+          "size": 129,
+          "sha": "22f7252727077a687fb0d498cf864fb8ac3e2c38"
+        },
+        {
+          "path": "tests/fixtures/projects/fastapi_service/src",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "7bd93764f1db73d8129075d25e12193102e89dc9"
+        },
+        {
+          "path": "tests/fixtures/projects/fastapi_service/src/shop",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "6ea7abbd6044fbd4635c6f08b1cda6dd108155fa"
+        },
+        {
+          "path": "tests/fixtures/projects/fastapi_service/src/shop/__init__.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 0,
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        {
+          "path": "tests/fixtures/projects/fastapi_service/src/shop/api.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 732,
+          "sha": "2a93cec853a4fc53a36ec553d0501f2c4989d33f"
+        },
+        {
+          "path": "tests/fixtures/projects/flutter_app",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "676e483c909f152f8e691928d704f6bab4c7ff05"
+        },
+        {
+          "path": "tests/fixtures/projects/flutter_app/android",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "ff537271533b0af23c8347745ac342d4b00327f3"
+        },
+        {
+          "path": "tests/fixtures/projects/flutter_app/android/app",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "ae199d5810a999b0a36f2da0fb23523583523941"
+        },
+        {
+          "path": "tests/fixtures/projects/flutter_app/android/app/build.gradle",
+          "type": "blob",
+          "mode": "100644",
+          "size": 106,
+          "sha": "e67a979e58276f584daf8a7ab3c0537bff3d63aa"
+        },
+        {
+          "path": "tests/fixtures/projects/flutter_app/integration_test",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "8fed22df5038aa8c6302a75571f6e30a2c4c673b"
+        },
+        {
+          "path": "tests/fixtures/projects/flutter_app/integration_test/app_test.dart",
+          "type": "blob",
+          "mode": "100644",
+          "size": 15,
+          "sha": "ab73b3a234abf58d9009026cfa184dd11ca56bf2"
+        },
+        {
+          "path": "tests/fixtures/projects/flutter_app/lib",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "ba850c7d85f38a2ae0528fbb37109aa91bbbf3aa"
+        },
+        {
+          "path": "tests/fixtures/projects/flutter_app/lib/main.dart",
+          "type": "blob",
+          "mode": "100644",
+          "size": 15,
+          "sha": "ab73b3a234abf58d9009026cfa184dd11ca56bf2"
+        },
+        {
+          "path": "tests/fixtures/projects/flutter_app/pubspec.yaml",
+          "type": "blob",
+          "mode": "100644",
+          "size": 130,
+          "sha": "3fe521c5a24eb05bad79226cfabcff079314da4e"
+        },
+        {
+          "path": "tests/fixtures/projects/ios_app",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "9135ce58f196f1b7c1448295261bef4668588633"
+        },
+        {
+          "path": "tests/fixtures/projects/ios_app/Todo.xcodeproj",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "68fd9e38fd9623a1a01c9af74b3029c88157d18c"
+        },
+        {
+          "path": "tests/fixtures/projects/ios_app/Todo.xcodeproj/project.pbxproj",
+          "type": "blob",
+          "mode": "100644",
+          "size": 7,
+          "sha": "155be2c487fa3784a4f4bce309975d2ddbc6342c"
+        },
+        {
+          "path": "tests/fixtures/projects/ios_app/Todo",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "af27515f326ec76f696a8d6712bd0d0b6ea82174"
+        },
+        {
+          "path": "tests/fixtures/projects/ios_app/Todo/Info.plist",
+          "type": "blob",
+          "mode": "100644",
+          "size": 233,
+          "sha": "2fadfb1a4190f891381614e12342fc531e7ca3a8"
+        },
+        {
+          "path": "tests/fixtures/projects/monorepo",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "4fbc4f4efc409772d624a8b608efc69be83b6ca1"
+        },
+        {
+          "path": "tests/fixtures/projects/monorepo/backend",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "5daf48b714204f1c0879928b16fb8d2955c1fa2f"
+        },
+        {
+          "path": "tests/fixtures/projects/monorepo/backend/app",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "7f0ac43ff3d2bb87fa46dd4b4f77d39c57464818"
+        },
+        {
+          "path": "tests/fixtures/projects/monorepo/backend/app/main.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 732,
+          "sha": "2a93cec853a4fc53a36ec553d0501f2c4989d33f"
+        },
+        {
+          "path": "tests/fixtures/projects/monorepo/backend/requirements.txt",
+          "type": "blob",
+          "mode": "100644",
+          "size": 16,
+          "sha": "97dc7cd8c1fd2f07d8ec79a1117664c5ebaf2842"
+        },
+        {
+          "path": "tests/fixtures/projects/monorepo/mobile",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "9488dd2c01e3e37192dfefc2add8098b21c5f586"
+        },
+        {
+          "path": "tests/fixtures/projects/monorepo/mobile/app.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 52,
+          "sha": "91c28c02e2909c0fed6aa00c1056ae6416452889"
+        },
+        {
+          "path": "tests/fixtures/projects/monorepo/mobile/package.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 148,
+          "sha": "5034bd2c3d60c46ba70479b708732b761baacac2"
+        },
+        {
+          "path": "tests/fixtures/projects/mql5_ea",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "52e17d5d59453558b9af0b21cc40f9cbd65fdb3e"
+        },
+        {
+          "path": "tests/fixtures/projects/mql5_ea/Experts",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d913f07e1f72e6ecf455884ddcd9d6368bbd61fb"
+        },
+        {
+          "path": "tests/fixtures/projects/mql5_ea/Experts/GoldEA.mq5",
+          "type": "blob",
+          "mode": "100644",
+          "size": 38,
+          "sha": "5747ac3d02e2da6bac9d8885a64a70c89ee348d8"
+        },
+        {
+          "path": "tests/fixtures/projects/next_app",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "92e3cb7835851a02b36860489f7722e02d97d92c"
+        },
+        {
+          "path": "tests/fixtures/projects/next_app/package-lock.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 3,
+          "sha": "0967ef424bce6791893e9a57bb952f80fd536e93"
+        },
+        {
+          "path": "tests/fixtures/projects/next_app/package.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 157,
+          "sha": "1060dc8b0f581d4aaf3026b348a2febbea8b81b1"
+        },
+        {
+          "path": "tests/fixtures/projects/python_cli",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "b4aed71dee2436f26c975f1dc9b49c4988d6b74f"
+        },
+        {
+          "path": "tests/fixtures/projects/python_cli/pyproject.toml",
+          "type": "blob",
+          "mode": "100644",
+          "size": 83,
+          "sha": "162aa4d447f8e4f795a0fb4a958c2ce147902461"
+        },
+        {
+          "path": "tests/fixtures/projects/python_cli/src",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "6f6dbd9f63591a75fd403de2d6102dd8313a8d9d"
+        },
+        {
+          "path": "tests/fixtures/projects/python_cli/src/tool",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d89ee9033b1757ded4e56e02532efe2c59f06715"
+        },
+        {
+          "path": "tests/fixtures/projects/python_cli/src/tool/main.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 27,
+          "sha": "71f9125d77c013627f50e71627ed6a2c60c3b245"
+        },
+        {
+          "path": "tests/fixtures/projects/rn_app",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "9488dd2c01e3e37192dfefc2add8098b21c5f586"
+        },
+        {
+          "path": "tests/fixtures/projects/rn_app/app.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 52,
+          "sha": "91c28c02e2909c0fed6aa00c1056ae6416452889"
+        },
+        {
+          "path": "tests/fixtures/projects/rn_app/package.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 148,
+          "sha": "5034bd2c3d60c46ba70479b708732b761baacac2"
+        },
+        {
+          "path": "tests/fixtures/projects/static_site",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "7c399c0a51b13b43c9c7e64ff8c01c130258164b"
+        },
+        {
+          "path": "tests/fixtures/projects/static_site/README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 106,
+          "sha": "9280f064972b568f0438a6f63d746ae01a9af890"
+        },
+        {
+          "path": "tests/fixtures/projects/static_site/about.html",
+          "type": "blob",
+          "mode": "100644",
+          "size": 285,
+          "sha": "e2c4239a76cd25c0e7e24807e99cd2586a5458e2"
+        },
+        {
+          "path": "tests/fixtures/projects/static_site/contact.html",
+          "type": "blob",
+          "mode": "100644",
+          "size": 157,
+          "sha": "f1a986076f4044ef9d712d7f1c03bc1ef9e19d89"
+        },
+        {
+          "path": "tests/fixtures/projects/static_site/index.html",
+          "type": "blob",
+          "mode": "100644",
+          "size": 664,
+          "sha": "4c48cc56284492f2d1364ec92ccf2b78b65c38f8"
+        },
+        {
+          "path": "tests/fixtures/projects/static_site/logo.svg",
+          "type": "blob",
+          "mode": "100644",
+          "size": 100,
+          "sha": "2b692e1408922304c5d638007187c1bd430e1cb0"
+        },
+        {
+          "path": "tests/fixtures/sample_api.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 3981,
+          "sha": "b05096c4168ac02296ed7915b72049cd677f04d3"
+        },
+        {
+          "path": "tests/fixtures/site",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "ab3ac003baa973eaa38d3d8db4d14877c8ca971e"
+        },
+        {
+          "path": "tests/fixtures/site/index.html",
+          "type": "blob",
+          "mode": "100644",
+          "size": 566,
+          "sha": "9526507dee65bd57ce94bfc1316315e970b44a56"
+        },
+        {
+          "path": "tests/fixtures/site/page2.html",
+          "type": "blob",
+          "mode": "100644",
+          "size": 306,
+          "sha": "e357d823627598ead0bc668b6954d8f3b0b112cf"
+        },
+        {
+          "path": "tests/test_api_runner.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 4305,
+          "sha": "c5bc4a5c3782481bd91728ba64b2eb52261fea94"
+        },
+        {
+          "path": "tests/test_autonomy.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 14607,
+          "sha": "c2235c96daa0deecae4bc041ee02171624c2b6e0"
+        },
+        {
+          "path": "tests/test_config.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2870,
+          "sha": "46c55d4a14c2360175b0688e3ee70d171992cdbf"
+        },
+        {
+          "path": "tests/test_goals_decision.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 5723,
+          "sha": "a0d6d8b8e628a1114c0ead051d3100e044a09bfd"
+        },
+        {
+          "path": "tests/test_pipeline.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 8546,
+          "sha": "e4d28b2bc17f01563106df3d09bc80b4b06c689a"
+        },
+        {
+          "path": "tests/test_static_runners.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 6219,
+          "sha": "b142fe471eb8a02cf12b251dc12149d8a1f6b9ee"
+        },
+        {
+          "path": "tests/test_ui_runner.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2890,
+          "sha": "2008c0d8d37b01982b5c8b83a6b68501ccb5b7d8"
+        }
+      ],
+      "status": "TREE_FETCHED"
+    },
+    {
+      "repository": "hypermindedd/Elyora-EnglishMastery",
+      "visibility": "private",
+      "default_branch": "main",
+      "head_sha": "5816b1edd9a061068d0489bc86c34d645423580c",
+      "tree_truncated": false,
+      "tree_entries": [
+        {
+          "path": ".gitattributes",
+          "type": "blob",
+          "mode": "100644",
+          "size": 563,
+          "sha": "8dbdaca1b8c80f100e740aac41167d3fbeb81a0f"
+        },
+        {
+          "path": ".github",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "4c1d8e50e5a378bb49424a8012b5b2ee5fcb3678"
+        },
+        {
+          "path": ".github/workflows",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "b724d5e8011aa32d10b3447e5435cf70e557a72d"
+        },
+        {
+          "path": ".github/workflows/elyora-transfer-tests.yml",
+          "type": "blob",
+          "mode": "100644",
+          "size": 801,
+          "sha": "5d15210f2ccb58d220e1c8d721ce002580c1916f"
+        },
+        {
+          "path": ".gitignore",
+          "type": "blob",
+          "mode": "100644",
+          "size": 289,
+          "sha": "0c9c589c366c842a9bd87e96f3a95ef86c27f489"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 3065,
+          "sha": "078c854bbcf746cdb238499cefd04c744c0afe66"
+        },
+        {
+          "path": "README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 7734,
+          "sha": "a2504af0fb3b5f5f0a0f5129bf5d7b634e151db6"
+        },
+        {
+          "path": "archive",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "7d02bc9d1e2580d6c6ad61b971371c8ff11082f0"
+        },
+        {
+          "path": "archive/README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2035,
+          "sha": "eb5c6cf07ba4fd0b907ace873b0432d668f343f5"
+        },
+        {
+          "path": "archive/checkpoints",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "117fd2981df29da2f388ed90390eb889798300dd"
+        },
+        {
+          "path": "archive/checkpoints/ELYORA-Code-3-Checkpoint.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 11678,
+          "sha": "d128e5ea02401827a24f5bfe63c1dfc20e7865d2"
+        },
+        {
+          "path": "archive/contracts",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "530b6efab6a4128243f883333599123528729316"
+        },
+        {
+          "path": "archive/contracts/19-VOICE-ONBOARDING-MOTIVATION-v3.0.5.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 3355,
+          "sha": "a9d6f726f56fcbc97cc9061e18115cb5d1ebed6c"
+        },
+        {
+          "path": "archive/engine-baselines",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "61bee7f5a71be317f3d80cf86d746075ff3335d2"
+        },
+        {
+          "path": "archive/engine-baselines/01-VISUAL-BASELINE-v1.0.0.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 8806,
+          "sha": "48a32cc86e5cb724574b5892f9e26705ac620dda"
+        },
+        {
+          "path": "archive/engine-baselines/02-JOURNEY-BASELINE-v1.1.0.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 8593,
+          "sha": "beb8a9f1cba17675b8ae3c8cfe6121b2fa1fee49"
+        },
+        {
+          "path": "archive/engine-baselines/03-DIAGNOSTIC-BASELINE-v1.1.0.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 8282,
+          "sha": "039ccbdfee5d5d4819effc5aba28c9ff07efc7d3"
+        },
+        {
+          "path": "archive/engine-baselines/04-ASSESSMENT-BASELINE-v1.0.0-LONG.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 43466,
+          "sha": "abe758f8326d364e8388a606b31629a8a8395901"
+        },
+        {
+          "path": "archive/engine-baselines/04-ASSESSMENT-BASELINE-v1.0.0-SHORT.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 11752,
+          "sha": "730a189e2ff9ed3c024819892cf57e2be76a6ac4"
+        },
+        {
+          "path": "archive/engine-baselines/05-LESSON-BASELINE-v1.0.0.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 10586,
+          "sha": "6770aebf40cf6149ee0ca6f587c418535cee63ef"
+        },
+        {
+          "path": "archive/engine-baselines/06-STORY-BASELINE-v2.0.0-LONG.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 38456,
+          "sha": "dad14366e379b2596245f13a0cce6f66a2e64f40"
+        },
+        {
+          "path": "archive/engine-baselines/06-STORY-BASELINE-v2.0.0-SHORT.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 11245,
+          "sha": "c880cf7b79d3f7afd2b0a9626adf6946b51a2563"
+        },
+        {
+          "path": "archive/engine-baselines/07-ARCHIVE-BASELINE-v1.0.0.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 7988,
+          "sha": "b22bb88d1b49a1d0430ab64a9eb5d022b56ee0d3"
+        },
+        {
+          "path": "archive/engine-baselines/08-IDENTITY-RELATIONSHIP-v1.0.0-LONG.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 42531,
+          "sha": "4c61588d1986a88a94c4deda55a75c8a9c203726"
+        },
+        {
+          "path": "archive/engine-baselines/08-IDENTITY-RELATIONSHIP-v1.0.0-SHORT.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 8085,
+          "sha": "110b18fe4bcb9f9fc43dfaa0815dde551d8d9ffd"
+        },
+        {
+          "path": "archive/engine-baselines/09-SAFETY-GOVERNANCE-BASELINE-v1.0.0.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 8885,
+          "sha": "8c41930982067cf562448d3993b63ea97b5ae4f4"
+        },
+        {
+          "path": "archive/engine-baselines/10-RUNTIME-BASELINE-v1.1.0-LONG.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 43602,
+          "sha": "5a0dd027dafb706400a8d6096adf6c8ac58ef7c8"
+        },
+        {
+          "path": "archive/engine-baselines/11-PROMPT-CONTEXT-CLOSURE-v1.0.0-LONG.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 95480,
+          "sha": "0a9557aaa47895dcf808e47acff7071e1e51d6a2"
+        },
+        {
+          "path": "archive/engine-baselines/12-TOOL-INTEGRATION-BASELINE-v1.0.0.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 10167,
+          "sha": "e23bbd243be6c49c537d7c6f9d90ee8aa3a3e5c1"
+        },
+        {
+          "path": "archive/engine-baselines/13-EVALUATION-QA-BASELINE-v1.0.0.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 10231,
+          "sha": "3120aee68b99e9508dae5541d628b072fb997ccb"
+        },
+        {
+          "path": "archive/engine-baselines/14-OBSERVABILITY-BASELINE-v1.0.0.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 10592,
+          "sha": "ab2eb7e516f0292fe2dcd6be230461f9ec4421fc"
+        },
+        {
+          "path": "archive/engine-baselines/15-FINAL-RELEASE-BASELINE-v1.0.0.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 11520,
+          "sha": "0902387220a0cb7f29fece92991e0f1173bb8146"
+        },
+        {
+          "path": "archive/handoff",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "cefe5d54835bfbbbfac3dbdb84470dfe5df6df42"
+        },
+        {
+          "path": "archive/handoff/ELYORA_3D_HANDOFF_FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 19097,
+          "sha": "ac37fa99f9e13aae7c5060d933ad7a789d01d42b"
+        },
+        {
+          "path": "archive/notion",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "68555307a67fa79255473eb2789dc101af680737"
+        },
+        {
+          "path": "archive/notion/02-MOTHER-PROJECT-OS.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1771,
+          "sha": "148c40121ddee8c6c0bbcdb54283c21e95525dec"
+        },
+        {
+          "path": "archive/notion/02-MOTHER-REGISTRY.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 4762,
+          "sha": "0fdf37dcd0b7af1ae5b50e368b8dd3173d32b874"
+        },
+        {
+          "path": "archive/notion/02C-CHARACTER-PROJECT-OS.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1742,
+          "sha": "b5b1abe37ac8c6e64388c0b912af2ec54aca2769"
+        },
+        {
+          "path": "archive/notion/02S-STUDENT-PROJECT-OS.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1551,
+          "sha": "4e9d80848aa8d5a93726cfdc3ab95bdebe937d95"
+        },
+        {
+          "path": "archive/notion/02T-TEACHER-PROJECT-OS.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1663,
+          "sha": "6b01cf46bad0b86b226cc32e044bd9ad7bba5d75"
+        },
+        {
+          "path": "archive/notion/ELYORA-v44-SUPPORT-AND-ACCESS-REPORT.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 21482,
+          "sha": "4cdcaa2bbd76b5baad40151a9ddef54a8de8e780"
+        },
+        {
+          "path": "archive/registries",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "5af89ba82cc2137ed362b92cac9f4a251c317827"
+        },
+        {
+          "path": "archive/registries/01-15-ENGINE-REGISTRY.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2157,
+          "sha": "b1d0ea041ea15a81f02ec84edbbd76266c383f7b"
+        },
+        {
+          "path": "archive/registries/11_ELYORA_ENGINE_REGISTRY__BACKUP.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 894,
+          "sha": "5fd3d92d2ce9dca491c3444362d09d2a17c5062b"
+        },
+        {
+          "path": "archive/registries/elyora-engines.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 3300,
+          "sha": "6ed0eef5f9441404fed83f165588117e90af0d5e"
+        },
+        {
+          "path": "contracts",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "0a9e93b126507ccc382d09a8c079dd2f73ee2fda"
+        },
+        {
+          "path": "contracts/README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2498,
+          "sha": "86a8803ff62353f500ae7d5bc2b5f271b2e12207"
+        },
+        {
+          "path": "contracts/schemas",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "8e73462ce002a51a259ac9be7c5aeef2782eb862"
+        },
+        {
+          "path": "contracts/schemas/assessment-evidence.schema.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2024,
+          "sha": "bc7b327062456d6d92bc55b86fbc7405ee10e61e"
+        },
+        {
+          "path": "contracts/schemas/engine-rule.schema.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1634,
+          "sha": "151dc319ee7af59111be6dacb3ac762efa14a46e"
+        },
+        {
+          "path": "contracts/schemas/entitlement-decision.schema.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1682,
+          "sha": "8fb4bb137c46e5cfbc4762ce9bdb9d18161444e6"
+        },
+        {
+          "path": "contracts/schemas/learner-state.schema.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1474,
+          "sha": "abfdaa6d431b11507a48babd65eae27238041d99"
+        },
+        {
+          "path": "contracts/schemas/release-evidence.schema.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1806,
+          "sha": "965fcf4a224cc3fa1634a1d21686a78eed4e63b9"
+        },
+        {
+          "path": "contracts/schemas/teacher-directive.schema.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1563,
+          "sha": "0e1c7a8a05b32bb24297240414759491ff685959"
+        },
+        {
+          "path": "docs",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "2df989497b4c5d755071168776e764e2d3911dc2"
+        },
+        {
+          "path": "docs/01-PRODUCT-VISION-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 6402,
+          "sha": "64e5ccd17d124298bfabb52649c4690946a137c9"
+        },
+        {
+          "path": "docs/02-PROJECT-BOUNDARIES-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 3149,
+          "sha": "564323eb58046192ad57727ef73c5029a444a2a3"
+        },
+        {
+          "path": "docs/03-ENGINE-REGISTRY-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 6041,
+          "sha": "0d6fcabdc1b7a2f5f6238f6163c48249dc6c2187"
+        },
+        {
+          "path": "docs/04-PRODUCT-REQUIREMENTS-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 6694,
+          "sha": "5a6b355351e5f795004bfccb0316d6964b96d77b"
+        },
+        {
+          "path": "docs/05-EVIDENCE-STATUS-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 5174,
+          "sha": "93b27ea9abba18d8b468c55616eb66f20b577428"
+        },
+        {
+          "path": "docs/06-ROADMAP-AND-GATES-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 5440,
+          "sha": "1f06e44ac8815b803ec07f8785e962bfed2a38fb"
+        },
+        {
+          "path": "docs/07-GLOBAL-STRATEGY-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 6712,
+          "sha": "d78f365273bbfac0ba733910d603ae6d582c0b30"
+        },
+        {
+          "path": "docs/08-SOURCE-INVENTORY-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 4823,
+          "sha": "b7ab5889bd01de19cfcbe4e28edac6ec9dd4c37d"
+        },
+        {
+          "path": "docs/09-SECURITY-IP-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 3779,
+          "sha": "6b988578d06b5fa055f324db98dfe3afe0669b9f"
+        },
+        {
+          "path": "docs/10-CHARACTER-ASSETS-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 3027,
+          "sha": "ad93d79afd0f8c0d1a55a7e12650151eaeedfc49"
+        },
+        {
+          "path": "docs/11-TEACHER-STUDENT-BRANCHES-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2210,
+          "sha": "ef19b903e3331e81c6270aaa9ac02c1736dbf57f"
+        },
+        {
+          "path": "docs/12-EXECUTIVE-OVERVIEW-EN.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 4030,
+          "sha": "8d441df3e5ac15e73c52c7d6cfe40500ba196bd1"
+        },
+        {
+          "path": "docs/13-REGISTRY-GOVERNANCE-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1842,
+          "sha": "260451f0ae21ad5caa8075a26e49791e3d83693f"
+        },
+        {
+          "path": "docs/14-CONTINUATION-PLAYBOOK-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 4969,
+          "sha": "de6ea642c5b7a08eaa739db680789a6246c27fc2"
+        },
+        {
+          "path": "docs/15-VISUAL-DEVICE-OUTPUT-RULES-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 5515,
+          "sha": "acba2ef34ee2ca988d184dfef749f0689f468dfa"
+        },
+        {
+          "path": "engines",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "fd9da246183e313860513a15d7b9efb1f5b0f68d"
+        },
+        {
+          "path": "engines/visual",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "f769226357f01ff957fd89079e8fbf254a6cbaf5"
+        },
+        {
+          "path": "engines/visual/01-ELY-ENG-01-VISUAL-ENGINE-v1.12.1.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 9259,
+          "sha": "a43bc8a1f973bf7ca5bd01eec1f67692379e4046"
+        },
+        {
+          "path": "engines/visual/CHANGELOG.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 3011,
+          "sha": "5a03e99fcfc2e2eb8859bac6959c1df6720d1bf9"
+        },
+        {
+          "path": "engines/visual/output-contract-v1.12.1.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2505,
+          "sha": "8f51d3c20ac6c1e35b560a16eb8ad9f3861c1e0e"
+        },
+        {
+          "path": "engines/visual/policy-provenance.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 805,
+          "sha": "e671979b6e501d46c034cf1e4080b8ab0f981981"
+        },
+        {
+          "path": "engines/visual/source-v1.12.0",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "bf7670645e1ae28b69b400e4e0da5549a34e1e2b"
+        },
+        {
+          "path": "engines/visual/source-v1.12.0/01-ELY-ENG-01-VISUAL-ENGINE-FINAL-LOCK-v1.12.0.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 3947,
+          "sha": "e898814bf150bc99990c1367bbc9b15a2044db04"
+        },
+        {
+          "path": "legal",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "17012f4d7f7ee73e82c3a4e6436931d46bded5da"
+        },
+        {
+          "path": "legal/CONTRACTS-REGISTER-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2237,
+          "sha": "2ad3af160c1d7a49e2505eb7cf24776bb2962004"
+        },
+        {
+          "path": "reports",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "5e0aeb6602b63dc0a2ccc6d22407c24da2703349"
+        },
+        {
+          "path": "reports/2026-10-24-RECOVERY-AUDIT.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 5699,
+          "sha": "4f9606ee8338335157c6e6c9cbbf1ec248e8a3d6"
+        },
+        {
+          "path": "reports/2026-10-24-REPOSITORY-VALIDATION.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2595,
+          "sha": "2105e444179d3f7244cc8146e5b7b0572b1e79cd"
+        },
+        {
+          "path": "reports/2026-10-25-WARDEN-SOURCE-AUDIT.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 4301,
+          "sha": "ada718b1bdd68c6b8bcf0e0cd72abab453484b10"
+        },
+        {
+          "path": "reports/pending-binary-handoff.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 4702,
+          "sha": "825f875151afddc3d377a3aa27d191d78ac698ea"
+        },
+        {
+          "path": "reports/source-manifest.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 16542,
+          "sha": "aa88b8aa5b197d479103ad32b2bc56755c8d0617"
+        },
+        {
+          "path": "tools",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "ce81f84618b325e407ada8e62a832c81cf9aa1bc"
+        },
+        {
+          "path": "tools/ELYORA-MAC-TRANSFER-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 7303,
+          "sha": "b3d62a793e300c95fdd6c431d0a5de027a6d4195"
+        },
+        {
+          "path": "tools/README-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 3616,
+          "sha": "00b00552dc88f606710529a2bf35acc72f32a689"
+        },
+        {
+          "path": "tools/elyora-import-source.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 6094,
+          "sha": "2d41b030cf6ec4e92485b443625718bbefbb4f7e"
+        },
+        {
+          "path": "tools/elyora-transfer-mac.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 25249,
+          "sha": "eecee7ede17ac1496c346997718c0523f0ff93ca"
+        },
+        {
+          "path": "tools/test_elyora_transfer.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 8044,
+          "sha": "a8deca12709cc006e2785a1bd3071a4e58717c3a"
+        }
+      ],
+      "status": "TREE_FETCHED"
+    },
+    {
+      "repository": "hypermindedd/Project-quallity-enginee",
+      "visibility": "private",
+      "default_branch": "main",
+      "tree_entries": [],
+      "status": "EMPTY_REPOSITORY",
+      "error": "CONFLICT: Error code: CONFLICT; Error: GitHub API error 409: {\"message\":\"Git Repository is empty.\",\"documentation_url\":\"https://docs.github.com/rest/git/trees#get-a-tree\",\"status\":\"409\"}"
+    },
+    {
+      "repository": "hypermindedd/quality",
+      "visibility": "public",
+      "default_branch": "main",
+      "tree_entries": [],
+      "status": "EMPTY_REPOSITORY",
+      "error": "CONFLICT: Error code: CONFLICT; Error: GitHub API error 409: {\"message\":\"Git Repository is empty.\",\"documentation_url\":\"https://docs.github.com/rest/git/trees#get-a-tree\",\"status\":\"409\"}"
+    },
+    {
+      "repository": "hypermindedd/white-hat",
+      "visibility": "private",
+      "default_branch": "main",
+      "head_sha": "6829dc1d1c003dd0a138aff1465f6a8fbd4091c0",
+      "tree_truncated": false,
+      "tree_entries": [
+        {
+          "path": "BACKUP",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "e80afee316c31afebe273f69302628796929dc44"
+        },
+        {
+          "path": "BACKUP/README-original-2026-11-02.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 73,
+          "sha": "b736e13754d3bcf976dbe18645556b665da6daf7"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 366,
+          "sha": "7ebd9c91892e204a66e7bbf9742a669fbd5b7a50"
+        },
+        {
+          "path": "CHECKSUMS.sha256",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2795,
+          "sha": "726d1275bc6fa6a196c9029fc3901f24eb8cf1a1"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2684,
+          "sha": "a88b5f67e4821beac75e70b335f0a7e7472825d9"
+        },
+        {
+          "path": "README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1805,
+          "sha": "1f11e9ebf625bf65c1ca835a03909e6fcaccc951"
+        },
+        {
+          "path": "VERSION",
+          "type": "blob",
+          "mode": "100644",
+          "size": 11,
+          "sha": "b453cdb192038c2516b8ad39cf26008b24e794f8"
+        },
+        {
+          "path": "docs",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "3ffa0e4a7bf5ef2a05835f1d732e54c183ae79c8"
+        },
+        {
+          "path": "docs/GAPS-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 3293,
+          "sha": "a7655913788508134edf61eb68f2bd596f4e4c01"
+        },
+        {
+          "path": "docs/INDEX.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 4679,
+          "sha": "7d632a822c0e34dc74bbe97775d937294d12835c"
+        },
+        {
+          "path": "docs/MIGRATION-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2138,
+          "sha": "6514a43932b59bec3f981f7120142c805f83a651"
+        },
+        {
+          "path": "docs/NEXT-CHAT-PROMPT-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 907,
+          "sha": "eddee839db2c654343ea2d2d493ebb7bb14b97ea"
+        },
+        {
+          "path": "docs/ROADMAP-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2671,
+          "sha": "f73c7ac3e6bad5d1a98cba0e3695848c7d7861ca"
+        },
+        {
+          "path": "docs/STATUS-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2145,
+          "sha": "d84caecb568c9a9abb91b5d5edbd6a1043ddfc17"
+        },
+        {
+          "path": "docs/VISION-FA.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 8178,
+          "sha": "8c736db217e5daa801f7af4a496c8482dd5295b4"
+        },
+        {
+          "path": "docs/source-manifest.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 9906,
+          "sha": "4effc5245946fcce06c8c7dbaabb9f58b41d7db2"
+        },
+        {
+          "path": "docs/sources",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "c6bbc38649a997cf48318778ff15b3afed7c5f6e"
+        },
+        {
+          "path": "docs/sources/PORTFOLIO-SUMMARY.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 3984,
+          "sha": "c665e0bffa37fe9e26824db1cb6e437b8b1d7007"
+        },
+        {
+          "path": "docs/sources/SM-EVAL-001.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2724,
+          "sha": "eec7242f6af0f80e854b62565f0a324d95677be2"
+        },
+        {
+          "path": "docs/sources/SM-EVAL-002.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 6569,
+          "sha": "4fb77cb7484e5599a465f8a9713c86919fd2ac05"
+        },
+        {
+          "path": "docs/sources/SM-GPT-INS-001.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 27489,
+          "sha": "a81c67bd29b4d8e81efcd5ebad9c8367d467ec00"
+        },
+        {
+          "path": "docs/sources/SM-GPT-V1-001.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 30442,
+          "sha": "a74ba31e2e5332b8011bf1b46fa3c568f9087be3"
+        },
+        {
+          "path": "docs/sources/SM-INT-V1-001.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 57843,
+          "sha": "e8511e372ecf6dfa7f45222d058fce130022047c"
+        },
+        {
+          "path": "docs/sources/SM-KNOW-01.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 17538,
+          "sha": "8173878c5e437ab00080cd5e7951494d60e985b5"
+        },
+        {
+          "path": "docs/sources/SM-KNOW-02.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 17880,
+          "sha": "8779027d907b42d271818a458f6adeaabb8b1a62"
+        },
+        {
+          "path": "docs/sources/SM-KNOW-03.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 13742,
+          "sha": "3e1d7b00029fdd2b1e73aba976944fc838d0c474"
+        },
+        {
+          "path": "docs/sources/SM-KNOW-04.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 20179,
+          "sha": "32cfaa8055614f492e7deacabe906cf8a9d30c64"
+        },
+        {
+          "path": "docs/sources/SM-KNOW-05.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 13873,
+          "sha": "f1cc1b04bc066acc70f398445a5b5854f9c1995b"
+        },
+        {
+          "path": "docs/sources/SM-KNOW-06.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 12425,
+          "sha": "e0b46e581aced4e6a4d26e9547ca777738ff48a7"
+        },
+        {
+          "path": "docs/sources/SM-KNOW-07.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 43422,
+          "sha": "8cee0d832a88e2a764e6cfe1277cf73468dd0727"
+        },
+        {
+          "path": "docs/sources/SM-KNOW-08.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 19320,
+          "sha": "14927cb18e3dfa78af59a64a23b4673e779d787d"
+        },
+        {
+          "path": "docs/sources/SM-LOG-001.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 10868,
+          "sha": "e1f7add23371e88729c1d8235187d685ae82ee24"
+        },
+        {
+          "path": "docs/sources/SM-REL-001.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 18665,
+          "sha": "5fa4a2557921f0a8f78971972c25a62384483d04"
+        },
+        {
+          "path": "docs/sources/SM-SPEC-V1-001.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 56156,
+          "sha": "4b42f87817b99359a33262d8772410d3b6341a49"
+        },
+        {
+          "path": "scripts",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "78c0412cb25b6f48ff235d7782cea40074f62700"
+        },
+        {
+          "path": "scripts/verify_docs.py",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1969,
+          "sha": "b517cfd684c79ba2208fc89ab2aa12eb8fa9226a"
+        }
+      ],
+      "status": "TREE_FETCHED"
+    },
+    {
+      "repository": "hypermindedd/ELYORA-Intelligent-Institute-Operating-System",
+      "visibility": "private",
+      "default_branch": "main",
+      "head_sha": "28a332aefbc27f02ef37e02eb02658c440329536",
+      "tree_truncated": false,
+      "tree_entries": [
+        {
+          "path": ".github",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d7b5bcb8034f09b9f47529ad71a58aac98d0bd42"
+        },
+        {
+          "path": ".github/pull_request_template.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 602,
+          "sha": "21f7d01560b6022bf2b364ce21dfb6c97aeb5c0b"
+        },
+        {
+          "path": ".github/workflows",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d2149cffa5d9d1833d3b3fd86548646e68a64e70"
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "type": "blob",
+          "mode": "100644",
+          "size": 476,
+          "sha": "82101ec96bd740943550d24089c4d94efbfe9986"
+        },
+        {
+          "path": ".github/workflows/pqe.yml",
+          "type": "blob",
+          "mode": "100644",
+          "size": 583,
+          "sha": "45efccb9f340acf1be5bd982e57a85a01540ebae"
+        },
+        {
+          "path": ".gitignore",
+          "type": "blob",
+          "mode": "100644",
+          "size": 95,
+          "sha": "9ba4b862083b0dcced26771de1429ee4d463ae1e"
+        },
+        {
+          "path": "AGENTS.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2531,
+          "sha": "b991ae575c12cbcbdb866b1abd31b18aa3ff83bf"
+        },
+        {
+          "path": "README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2649,
+          "sha": "3da098334aef7b02b9af1cdb8765dd6e0546824e"
+        },
+        {
+          "path": "apps",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "7cc9a4353b107c23f9d4bdc6547362fd4b49a68a"
+        },
+        {
+          "path": "apps/guided-student",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "2fbdc1618d5d3d6493cb789ce0d62d904b907055"
+        },
+        {
+          "path": "apps/guided-student/README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 356,
+          "sha": "0a878d38b0becde2538d9857978b6c5fbe83b2f7"
+        },
+        {
+          "path": "apps/institute-command",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "cbb4985d60ae269c6b8802182db1d07e89ddfaad"
+        },
+        {
+          "path": "apps/institute-command/README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 338,
+          "sha": "2a6a0b4cbca03ddefb950719b462f1e4945d7e62"
+        },
+        {
+          "path": "apps/teacher-leader",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "11c01c0ecc6754221aa432a545a790ff290c356a"
+        },
+        {
+          "path": "apps/teacher-leader/README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 375,
+          "sha": "24eb62b015b9cd4c7d09556b0ab29742db78c11b"
+        },
+        {
+          "path": "contracts",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "3e060687aaf82fe1527ffae9424d26c7d7783cde"
+        },
+        {
+          "path": "contracts/README.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 496,
+          "sha": "5fe3c09db1d7bc5f6e979dc347309640324388a3"
+        },
+        {
+          "path": "contracts/schemas",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "b8642a61ef987aee69e04e1fb34837988e9f1c5c"
+        },
+        {
+          "path": "contracts/schemas/event-envelope.v1.schema.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1344,
+          "sha": "7720b898df59d76d12e9465075f56829cf8754af"
+        },
+        {
+          "path": "contracts/schemas/learning-scope-directive.v1.schema.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2073,
+          "sha": "10360afe7dd94b7d4fb194d4f22d6790b7b13cfe"
+        },
+        {
+          "path": "contracts/schemas/teacher-qualification.v1.schema.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1328,
+          "sha": "b507c384420ae808647f99ad4c7b6b2b4b4e2a39"
+        },
+        {
+          "path": "contracts/schemas/virtual-room.v1.schema.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1040,
+          "sha": "eaec00203286c978fc0860d5575b83af5e6723cd"
+        },
+        {
+          "path": "docs",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "d2c428c2fd75f71dd0e85d4e63bcd2820fda6637"
+        },
+        {
+          "path": "docs/adr",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "92c75c212feeafda050af8dffb8587a7ec654d73"
+        },
+        {
+          "path": "docs/adr/ADR-EI-001.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1088,
+          "sha": "8499ddf1c020909695e1d1099fd1dfec67ffcd85"
+        },
+        {
+          "path": "docs/adr/ADR-EI-002.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1107,
+          "sha": "7f20ebd9e85dd3e1ad97d31c0f0c832c8f65c9f8"
+        },
+        {
+          "path": "docs/adr/ADR-EI-003.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1098,
+          "sha": "642516245b22bf37ddcc160418e0500342e0a9d1"
+        },
+        {
+          "path": "docs/adr/ADR-EI-004.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1107,
+          "sha": "19ca4e565b961dfdcce4a19a16f0f19d3d97c702"
+        },
+        {
+          "path": "docs/adr/ADR-EI-005.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1103,
+          "sha": "68d311eab3df22013d68d775929915baec62d6f3"
+        },
+        {
+          "path": "docs/adr/ADR-EI-006.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1092,
+          "sha": "654d0cfc62d57eb1457c10643a3de4eb0b1ed6c2"
+        },
+        {
+          "path": "docs/architecture",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "3c4708f60238f39da7171dd59534900a0c45bc91"
+        },
+        {
+          "path": "docs/architecture/ATOMIC_CAPABILITY_MANIFEST.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1016,
+          "sha": "c3b610a6460b107011e4d81b49360d6a95d5d173"
+        },
+        {
+          "path": "docs/architecture/CABINS_AND_ROOMS.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1342,
+          "sha": "fb0a40e948ff863e6f32d33565c6c56cecd77b5c"
+        },
+        {
+          "path": "docs/architecture/CONTRACT_CATALOG.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1748,
+          "sha": "4214fa0b1c82e0342b06625460df311cd3ba9590"
+        },
+        {
+          "path": "docs/architecture/DOMAIN_OWNERSHIP.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2032,
+          "sha": "6a28362cd943c86eae7be65bf0e4fc8ba330a1e4"
+        },
+        {
+          "path": "docs/architecture/ENGINE_REGISTRY.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 3346,
+          "sha": "86abe407be5db0a21a11c3489cf3f6d660d4d01f"
+        },
+        {
+          "path": "docs/architecture/PRIVACY_AUTHZ_MATRIX.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2044,
+          "sha": "254bc8dcc0537cbc60688fe16e8358bdb71597f3"
+        },
+        {
+          "path": "docs/architecture/REFERENCE_ARCHITECTURE.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2683,
+          "sha": "66d3b76214e8887098bdd538f70639e8ae4670a0"
+        },
+        {
+          "path": "docs/architecture/TEACHER_QUALIFICATION.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1289,
+          "sha": "8bad4387e5d0cdb3d158dc3f9da1d33b4b01c5a9"
+        },
+        {
+          "path": "docs/architecture/UX_TOKENS.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 778,
+          "sha": "42a00de60dbb42e7600fb81262c1e7bfbbd01d87"
+        },
+        {
+          "path": "docs/audits",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "59154dc492fda2742ea2c4b5db1b2582d6c745f1"
+        },
+        {
+          "path": "docs/audits/AGENTS_SKILLS_REUSE.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1533,
+          "sha": "5d487140bb631ad0976c65b9124d8228a2e5ded4"
+        },
+        {
+          "path": "docs/audits/SOURCE_AUDIT_2026-11-07.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2621,
+          "sha": "59c6d17a8ebc74d632c005305350866a8d3cda32"
+        },
+        {
+          "path": "docs/governance",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "e902f4bd0cc5c5275cd59697bf441539459a04c6"
+        },
+        {
+          "path": "docs/governance/PROJECT_CONSTITUTION.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 3289,
+          "sha": "08aabc64f3aca95dd73e1f09a04f64842134620a"
+        },
+        {
+          "path": "docs/releases",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "3c8be08b7bf539a71bd48af0a6cab3f76c5e1a82"
+        },
+        {
+          "path": "docs/releases/EVIDENCE_2026-11-07.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 944,
+          "sha": "8058fc003fd927417a67dfcbc6dec37ed2fc164e"
+        },
+        {
+          "path": "docs/releases/STATUS.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1719,
+          "sha": "a6f5fe44449d2bd4535d6fb01595c39cd5cce8b5"
+        },
+        {
+          "path": "docs/roadmap",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "e1efe63321ed414cc286f7d4fd80048724f310d5"
+        },
+        {
+          "path": "docs/roadmap/BUILD_PLAN.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1975,
+          "sha": "513bfc14013db51cfe043f498c3ad10fb98503d9"
+        },
+        {
+          "path": "docs/roadmap/NEXT_BUILD_A2.md",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1753,
+          "sha": "bbf99b366dcd231e72694598740d0171eb486c1e"
+        },
+        {
+          "path": "examples",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "74520b144a3a91d631833242bb92ef922cc89fb2"
+        },
+        {
+          "path": "examples/vertical-slice.mjs",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2372,
+          "sha": "e119c405b52c5fe57eaa2e238fb842f7578ea11c"
+        },
+        {
+          "path": "package.json",
+          "type": "blob",
+          "mode": "100644",
+          "size": 300,
+          "sha": "b0efb0a6181fe3bbe93ee32f9250d060cc0e583d"
+        },
+        {
+          "path": "scripts",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "fae65a6a927ea36d72bc826bb3a1c3526231d352"
+        },
+        {
+          "path": "scripts/validate-contracts.mjs",
+          "type": "blob",
+          "mode": "100644",
+          "size": 936,
+          "sha": "3688c3a21faab68beb77c8c03094f9d27fca2d4c"
+        },
+        {
+          "path": "src",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "c7df2a466adba94dd0a19fa7b55d1f959c559cee"
+        },
+        {
+          "path": "src/adapters",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "9b4294c28972619f9810a4aa8fce3d8ee9027231"
+        },
+        {
+          "path": "src/adapters/elyora-port.mjs",
+          "type": "blob",
+          "mode": "100644",
+          "size": 423,
+          "sha": "7cf9d9cc38fbdffd11d0eca05103277500477a43"
+        },
+        {
+          "path": "src/domain",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "eea5b5994f810df848bf34e965eba78dd5c06c5d"
+        },
+        {
+          "path": "src/domain/intelligence.mjs",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2073,
+          "sha": "60e9f7b9ba133da4783c9e93ff00f4d63bd715cd"
+        },
+        {
+          "path": "src/domain/learning-scope.mjs",
+          "type": "blob",
+          "mode": "100644",
+          "size": 4609,
+          "sha": "748905cd0b1ea23ba432728b6bdf9ce5efd64bb9"
+        },
+        {
+          "path": "src/domain/policy.mjs",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1781,
+          "sha": "c4c2598a05168e1ebfb1600fc510d100fadd2e05"
+        },
+        {
+          "path": "src/domain/projections.mjs",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1644,
+          "sha": "f09360aa7b4568c7477b2afab939f02dfefb1256"
+        },
+        {
+          "path": "src/domain/qualification.mjs",
+          "type": "blob",
+          "mode": "100644",
+          "size": 1589,
+          "sha": "368db1549b0b320be6708d65b2d290d8877119de"
+        },
+        {
+          "path": "src/domain/rooms.mjs",
+          "type": "blob",
+          "mode": "100644",
+          "size": 2241,
+          "sha": "a6d625c2f4664144863bae2e8347daa520b29ed6"
+        },
+        {
+          "path": "tests",
+          "type": "tree",
+          "mode": "040000",
+          "size": null,
+          "sha": "65d9fc5597e9e8c52de180594c490ce7164defdc"
+        },
+        {
+          "path": "tests/domain.test.mjs",
+          "type": "blob",
+          "mode": "100644",
+          "size": 10302,
+          "sha": "10946f053b396e9eb0a97e158ffbbb151999558f"
+        }
+      ],
+      "status": "TREE_FETCHED"
+    }
+  ]
+}
