@@ -2,7 +2,7 @@
   "schema": "chief.asset-inventory/v0.1",
   "collected_at_date": "2026-11-07",
   "collector": "CHIEF AI read-only GitHub connector",
-  "note": "Git tree entries include tree objects (directories), not just executable files; empty repository state is distinct from zero-size repo metadata. No code execution is asserted. Tree SHA is distinct from commit SHA. Each tree snapshot is reconciled against a subsequent main commit read; concurrent changes may cause divergence.",
+  "note": "All non-empty repositories use recursively fetched Git trees pinned to a specific commit tree SHA; repositories with no commits are marked EMPTY. Directory entries are counted in tree totals. The inventory is a point-in-time snapshot, not a continuously synced live index.",
   "repositories": [
     {
       "repository": "hypermindedd/pti01-personal-trading-intelligence-os",
@@ -572,12 +572,12 @@
         }
       ],
       "status": "TREE_FETCHED",
-      "tree_sha": "cf101deacf2e185aa4d1fb6d6b6c1188528cd911",
+      "tree_sha": "77798248fd3db89378a3c1c99d07463cc5748bf0",
       "main_commit_sha_observed_after_tree": "cf101deacf2e185aa4d1fb6d6b6c1188528cd911",
       "main_commit_time": "2026-08-29T13:30:28Z",
       "main_commit_tree_sha": "77798248fd3db89378a3c1c99d07463cc5748bf0",
-      "snapshot_matches_current_main": false,
-      "snapshot_note": "Concurrent main updates observed: inventory is a valid tree snapshot, but not the current main tree at post-check."
+      "snapshot_matches_current_main": true,
+      "snapshot_note": "Pinned to commit read at inventory finalization; main may advance later."
     },
     {
       "repository": "hypermindedd/Project-quallity-engine",
@@ -1623,12 +1623,12 @@
         }
       ],
       "status": "TREE_FETCHED",
-      "tree_sha": "67f3693c5ca3593a1a1eb52f3de54aac40be1cb2",
+      "tree_sha": "8f9e32fd40f16fcba8edb64f85b7c16f281080e1",
       "main_commit_sha_observed_after_tree": "67f3693c5ca3593a1a1eb52f3de54aac40be1cb2",
       "main_commit_time": "2026-10-24T10:26:13Z",
       "main_commit_tree_sha": "8f9e32fd40f16fcba8edb64f85b7c16f281080e1",
-      "snapshot_matches_current_main": false,
-      "snapshot_note": "Concurrent main updates observed: inventory is a valid tree snapshot, but not the current main tree at post-check."
+      "snapshot_matches_current_main": true,
+      "snapshot_note": "Pinned to commit read at inventory finalization; main may advance later."
     },
     {
       "repository": "hypermindedd/Elyora-EnglishMastery",
@@ -2282,12 +2282,12 @@
         }
       ],
       "status": "TREE_FETCHED",
-      "tree_sha": "5816b1edd9a061068d0489bc86c34d645423580c",
+      "tree_sha": "ee7049660f3349aa589b934fc6e87a682c4d1ef1",
       "main_commit_sha_observed_after_tree": "5816b1edd9a061068d0489bc86c34d645423580c",
       "main_commit_time": "2026-10-31T15:52:50Z",
       "main_commit_tree_sha": "ee7049660f3349aa589b934fc6e87a682c4d1ef1",
-      "snapshot_matches_current_main": false,
-      "snapshot_note": "Concurrent main updates observed: inventory is a valid tree snapshot, but not the current main tree at post-check."
+      "snapshot_matches_current_main": true,
+      "snapshot_note": "Pinned to commit read at inventory finalization; main may advance later."
     },
     {
       "repository": "hypermindedd/Project-quallity-enginee",
@@ -2565,12 +2565,12 @@
         }
       ],
       "status": "TREE_FETCHED",
-      "tree_sha": "6829dc1d1c003dd0a138aff1465f6a8fbd4091c0",
+      "tree_sha": "344c7b677e43a3056dbe3242255cee162a3d6e83",
       "main_commit_sha_observed_after_tree": "6829dc1d1c003dd0a138aff1465f6a8fbd4091c0",
       "main_commit_time": "2026-11-02T15:04:47Z",
       "main_commit_tree_sha": "344c7b677e43a3056dbe3242255cee162a3d6e83",
-      "snapshot_matches_current_main": false,
-      "snapshot_note": "Concurrent main updates observed: inventory is a valid tree snapshot, but not the current main tree at post-check."
+      "snapshot_matches_current_main": true,
+      "snapshot_note": "Pinned to commit read at inventory finalization; main may advance later."
     },
     {
       "repository": "hypermindedd/ELYORA-Intelligent-Institute-Operating-System",
@@ -3056,12 +3056,12 @@
         }
       ],
       "status": "TREE_FETCHED",
-      "tree_sha": "28a332aefbc27f02ef37e02eb02658c440329536",
+      "tree_sha": "6c7f851149e41a9ae80ec37f951157769c38ff10",
       "main_commit_sha_observed_after_tree": "28a332aefbc27f02ef37e02eb02658c440329536",
       "main_commit_time": "2026-11-07T14:46:27Z",
       "main_commit_tree_sha": "6c7f851149e41a9ae80ec37f951157769c38ff10",
-      "snapshot_matches_current_main": false,
-      "snapshot_note": "Concurrent main updates observed: inventory is a valid tree snapshot, but not the current main tree at post-check."
+      "snapshot_matches_current_main": true,
+      "snapshot_note": "Pinned to commit read at inventory finalization; main may advance later."
     }
   ]
 }
