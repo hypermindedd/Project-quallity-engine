@@ -1,0 +1,135 @@
+{
+  "schema": "chief.evidence-registry/v0.1",
+  "date": "2026-11-07",
+  "status_vocab": [
+    "VERIFIED_SOURCE",
+    "VERIFIED_CI",
+    "REPORTED_NOT_INDEPENDENTLY_RUN",
+    "PARTIAL",
+    "SKIPPED",
+    "EMPTY",
+    "UNKNOWN",
+    "CONFLICT"
+  ],
+  "records": [
+    {
+      "id": "EV-GH-001",
+      "asset": "PQE.01",
+      "claim": "At audited main commit, 73 pytest tests passed on Python 3.11 and Python 3.13.",
+      "status": "VERIFIED_CI",
+      "commit": "67f3693c5ca3593a1a1eb52f3de54aac40be1cb2",
+      "source": "https://github.com/hypermindedd/Project-quallity-engine/actions/runs/40085907937",
+      "detail": "CI jobs success, job logs show '73 passed' on both Python versions. Not rerun in this session."
+    },
+    {
+      "id": "EV-GH-002",
+      "asset": "PQE.01",
+      "claim": "Workflow self-test passed but assessed static-site and API-service quality as CONDITIONAL.",
+      "status": "VERIFIED_CI",
+      "source": "https://github.com/hypermindedd/Project-quallity-engine/actions/runs/40085907884",
+      "detail": "Jobs web/static-site and web/api-service logged CONDITIONAL; workflow called fail-on: never. A green GitHub job is not a GO release verdict."
+    },
+    {
+      "id": "EV-GH-003",
+      "asset": "PQE.01",
+      "claim": "Three Claude Code skills and two agent prompts are in source tree.",
+      "status": "VERIFIED_SOURCE",
+      "source": "https://github.com/hypermindedd/Project-quallity-engine/tree/67f3693c5ca3593a1a1eb52f3de54aac40be1cb2/plugin",
+      "skills": [
+        {
+          "id": "pqe-onboard",
+          "file": "plugin/skills/pqe-onboard/SKILL.md",
+          "type": "SKILL",
+          "source": "https://github.com/hypermindedd/Project-quallity-engine/blob/67f3693c5ca3593a1a1eb52f3de54aac40be1cb2/plugin/skills/pqe-onboard/SKILL.md",
+          "state": "SOURCE_PRESENT_NOT_CHATGPT_INSTALLED"
+        },
+        {
+          "id": "pqe-run",
+          "file": "plugin/skills/pqe-run/SKILL.md",
+          "type": "SKILL",
+          "source": "https://github.com/hypermindedd/Project-quallity-engine/blob/67f3693c5ca3593a1a1eb52f3de54aac40be1cb2/plugin/skills/pqe-run/SKILL.md",
+          "state": "SOURCE_PRESENT_NOT_CHATGPT_INSTALLED"
+        },
+        {
+          "id": "pqe-fix",
+          "file": "plugin/skills/pqe-fix/SKILL.md",
+          "type": "SKILL",
+          "source": "https://github.com/hypermindedd/Project-quallity-engine/blob/67f3693c5ca3593a1a1eb52f3de54aac40be1cb2/plugin/skills/pqe-fix/SKILL.md",
+          "state": "SOURCE_PRESENT_NOT_CHATGPT_INSTALLED"
+        },
+        {
+          "id": "pqe-auditor",
+          "file": "plugin/agents/pqe-auditor.md",
+          "type": "AGENT",
+          "state": "SOURCE_PRESENT_NOT_RUNTIME_VERIFIED"
+        },
+        {
+          "id": "pqe-test-architect",
+          "file": "plugin/agents/pqe-test-architect.md",
+          "type": "AGENT",
+          "state": "SOURCE_PRESENT_NOT_RUNTIME_VERIFIED"
+        }
+      ]
+    },
+    {
+      "id": "EV-GH-004",
+      "asset": "PQE.01",
+      "claim": "Android, iOS, Windows MQL5 production checks were not proven by latest fixture selftest.",
+      "status": "SKIPPED",
+      "source": "https://github.com/hypermindedd/Project-quallity-engine/actions/runs/40085907884",
+      "detail": "Platform jobs skipped for fixture types; separate attestation required."
+    },
+    {
+      "id": "EV-GH-005",
+      "asset": "PQE.01",
+      "claim": "Source decision function can report GO when no hard gate and no blocking/sev1 findings exist, even if relevant checks are skipped.",
+      "status": "VERIFIED_SOURCE",
+      "source": "https://github.com/hypermindedd/Project-quallity-engine/blob/67f3693c5ca3593a1a1eb52f3de54aac40be1cb2/src/pqe/analysis/triage.py",
+      "detail": "Code inspection only: decide() reacts to SEV0, NOT_MET hard goals, SEV1, ERROR; it does not itself require minimum coverage, and does not block on SKIPPED or UNCALIBRATED."
+    },
+    {
+      "id": "EV-GH-006",
+      "asset": "PQE.01",
+      "claim": "One of 12 most recent workflow runs failed in CI initially and later commits passed.",
+      "status": "VERIFIED_CI",
+      "source": "https://github.com/hypermindedd/Project-quallity-engine/actions/runs/40083365271",
+      "detail": "Two early engine CI runs had failure; later engine CI runs succeeded."
+    },
+    {
+      "id": "EV-NO-001",
+      "asset": "CHIEF AI OS",
+      "claim": "Universal OS, Handshake v1.0 and Agent Protocol v1.1 are documented in Notion.",
+      "status": "VERIFIED_SOURCE",
+      "source": "https://app.notion.com/p/3c93337113178190ab35d5a2808a3def",
+      "detail": "This is governance documentation; it does not prove live bridges or watchers are operating now."
+    },
+    {
+      "id": "EV-GH-007",
+      "asset": "ELYORA Institute OS",
+      "claim": "Current main tree contains ADRs, project constitution, engine registry and audits; repository size metadata showed zero and was stale/misleading.",
+      "status": "VERIFIED_SOURCE",
+      "source": "https://github.com/hypermindedd/ELYORA-Intelligent-Institute-Operating-System/commit/9b0b42880767eb65c76ad90b12223c0c59ab1aaf"
+    },
+    {
+      "id": "EV-GH-008",
+      "asset": "PTI.01",
+      "claim": "Repository is W0 architecture/bootstrap, no trading runtime claimed.",
+      "status": "VERIFIED_SOURCE",
+      "source": "https://github.com/hypermindedd/pti01-personal-trading-intelligence-os/blob/main/README.md"
+    },
+    {
+      "id": "EV-GH-009",
+      "asset": "SECOND MIND",
+      "claim": "White-hat repository is Second Mind documentation snapshot; no product execution claimed.",
+      "status": "VERIFIED_SOURCE",
+      "source": "https://github.com/hypermindedd/white-hat/blob/main/README.md"
+    },
+    {
+      "id": "EV-GH-010",
+      "asset": "ELYORA English Mastery",
+      "claim": "Documentation and transfer tooling exist, complete production source/acceptance not independently verified.",
+      "status": "PARTIAL",
+      "source": "https://github.com/hypermindedd/Elyora-EnglishMastery/blob/main/README.md"
+    }
+  ]
+}
