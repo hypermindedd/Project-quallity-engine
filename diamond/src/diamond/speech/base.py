@@ -47,7 +47,10 @@ class MlxTranscriber:
     def transcribe(self, wav: Path, cfg: SpeechConfig) -> list[tuple[str, float, float, float]]:
         import mlx_whisper  # type: ignore[import-not-found]
 
-        repo = cfg.model if "/" in cfg.model else f"mlx-community/whisper-{cfg.model}"
+        from .models import local_model
+
+        local = local_model(cfg.model)  # verified copy from `diamond fetch-model`
+        repo = str(local) if local else (cfg.model if "/" in cfg.model else f"mlx-community/whisper-{cfg.model}")
         result = mlx_whisper.transcribe(str(wav), path_or_hf_repo=repo, language=cfg.language,
                                         word_timestamps=True, initial_prompt=_prompt(cfg))
         return [(w["word"], w["start"], w["end"], w.get("probability", 1.0))

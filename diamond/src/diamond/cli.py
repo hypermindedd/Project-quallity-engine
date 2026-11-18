@@ -58,6 +58,19 @@ def _cmd_analyze(args: argparse.Namespace) -> int:
                                      for f in outcome.findings) else 0
 
 
+def _cmd_fetch_model(args: argparse.Namespace) -> int:
+    from .speech.models import ModelFetchError, fetch_model
+
+    print(f"💎 downloading speech model '{args.model}' over {args.connections} connections (resumable) …")
+    try:
+        path = fetch_model(args.model, args.connections)
+    except (ModelFetchError, OSError) as exc:
+        print(f"\n❌ {exc}  — run the same command again to resume.", file=sys.stderr)
+        return 1
+    print(f"\n💎 model ready: {path}")
+    return 0
+
+
 def _cmd_mcp(args: argparse.Namespace) -> int:  # noqa: ARG001
     from .mcp_server import main as mcp_main
 
@@ -85,6 +98,11 @@ def main(argv: list[str] | None = None) -> int:
     an.add_argument("--no-speech", action="store_true")
     an.add_argument("--fail-on", choices=["SEV0", "SEV1", "SEV2", "SEV3"], help="exit 2 if a finding at/above this severity exists")
     an.set_defaults(func=_cmd_analyze)
+
+    fm = sub.add_parser("fetch-model", help="download the speech model (parallel, resumable, verified)")
+    fm.add_argument("--model", default="large-v3-turbo")
+    fm.add_argument("--connections", type=int, default=16)
+    fm.set_defaults(func=_cmd_fetch_model)
 
     mcp = sub.add_parser("mcp", help="run the MCP server (stdio)")
     mcp.set_defaults(func=_cmd_mcp)

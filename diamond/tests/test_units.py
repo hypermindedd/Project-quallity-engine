@@ -187,3 +187,58 @@ def test_contrast_on_gradient_is_not_a_false_failure():
     res = AccessibilityAnalyzer().run(AnalysisContext(Store(), DiamondConfig(), [inv]))
     ids = [f.check_id for f in res.findings]
     assert "a11y.contrast" not in ids and "a11y.contrast_unverified" in ids
+
+
+def test_parallel_resumable_model_fetch(tmp_path, monkeypatch):
+    """Range download over a local HTTP server, interrupted once, then resumed and verified."""
+    import functools
+    import hashlib
+    import http.server
+    import json as _json
+    import threading
+
+    from diamond.speech import models
+
+    blob = bytes(range(256)) * 80_000  # ~20 MB → 3 chunks
+    root = tmp_path / "srv"
+    (root / "api/models/org/m/tree").mkdir(parents=True)
+    (root / "org/m/resolve/main").mkdir(parents=True)
+    (root / "org/m/resolve/main/weights.safetensors").write_bytes(blob)
+    (root / "org/m/resolve/main/config.json").write_text("{}")
+    (root / "api/models/org/m/tree/main").write_text(_json.dumps([
+        {"type": "file", "path": "config.json", "size": 2},
+        {"type": "file", "path": "weights.safetensors", "size": len(blob),
+         "lfs": {"oid": hashlib.sha256(blob).hexdigest()}}]))
+
+    class Ranged(http.server.SimpleHTTPRequestHandler):
+        fail_once = {"done": False}
+
+        def log_message(self, *a):
+            pass
+
+        def do_GET(self):
+            rng = self.headers.get("Range")
+            if not rng:
+                return super().do_GET()
+            if not Ranged.fail_once["done"]:
+                Ranged.fail_once["done"] = True
+                self.send_error(503)
+                return
+            start, end = (int(x) for x in rng.split("=")[1].split("-"))
+            data = (root / self.path.lstrip("/")).read_bytes()[start:end + 1]
+            self.send_response(206)
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+
+    server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(Ranged, directory=str(root)))
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    monkeypatch.setenv("HF_ENDPOINT", f"http://127.0.0.1:{server.server_address[1]}")
+    monkeypatch.setenv("DIAMOND_MODELS_DIR", str(tmp_path / "models"))
+    monkeypatch.setattr(models.time, "sleep", lambda s: None)
+    try:
+        path = models.fetch_model("org/m", connections=4, progress=lambda d, t: None)
+    finally:
+        server.shutdown()
+    assert (path / "weights.safetensors").read_bytes() == blob
+    assert models.local_model("org/m") == path

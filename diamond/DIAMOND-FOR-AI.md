@@ -38,7 +38,10 @@ bash <path-to>/diamond-run                 # narrated review (the user talks and
 - It finds a running dev server or starts one (Next, Vite, Nuxt, Astro, SvelteKit, CRA, Angular,
   Gatsby, Remix, FastAPI, Flask, Django, plain HTML), and stops it afterwards. Python apps use the
   project's .venv (created and filled from requirements.txt on first run).
-- If Google Chrome is installed it is used directly (no browser download). Use `--url http://localhost:PORT` if detection fails.
+- If Google Chrome is installed it is used directly (no browser download).
+- Speech model (once, ~1.6 GB): if transcription stalls on a slow network, download it in parallel
+  (resumable, checksum-verified) with `~/.diamond-engine/venv/bin/diamond fetch-model`, then
+  `diamond-run --analyze-last`. Use `--url http://localhost:PORT` if detection fails.
 - Tell the user, in Persian: talk while pointing; `Alt+Shift+M` marks an element without speaking;
   close the browser window to finish.
 - No human available / quick automatic check: `--smoke 20` (headless, no mic, 20 seconds).
