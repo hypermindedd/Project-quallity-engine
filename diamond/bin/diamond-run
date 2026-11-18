@@ -1,0 +1,344 @@
+#!/usr/bin/env bash
+# =============================================================================
+# diamond-run — one command to review the current project with Diamond.
+#
+#   diamond-run [PROJECT_DIR] [options]
+#
+# What it does, idempotently (safe to run every time):
+#   1. finds the engine:  $DIAMOND_SRC → Google Drive (synced folder "Diamondengine")
+#                         → ~/Documents/Diamondengine → GitHub branch diamond/mvp
+#   2. installs/updates it in ~/.diamond-engine (own venv; never touches system Python)
+#   3. finds or starts the project's dev server (Next, Vite, Nuxt, Astro, SvelteKit,
+#      CRA, Angular, Gatsby, Remix, plain HTML) and waits until it answers
+#   4. opens the narrated review; when the window closes it analyses the session
+#   5. opens the Persian report and stops the dev server it started
+#
+# Options:
+#   --url URL       review this URL instead of detecting/starting a dev server
+#   --no-audio      record without the microphone
+#   --update        force re-install of the engine
+#   --analyze-last  re-analyse the newest session of this project (no browser)
+#   --doctor        print what would be used and exit (no changes)
+#   --dry-run       same as --doctor
+#   --no-open       do not open the report at the end
+#   --smoke SECONDS automatic pass without a human: headless, no microphone,
+#                   stops after SECONDS and analyses (good for AI-only checks / CI)
+#   --install-self  copy this launcher to ~/.local/bin so `diamond-run` works anywhere
+#   -h, --help
+#
+# Exit codes: 0 ok · 2 bad usage · 3 missing prerequisite · 4 engine not found
+#             5 dev server failed · other = engine error
+# Works with macOS' bash 3.2 (no bash-4 features).
+# =============================================================================
+set -euo pipefail
+
+ENGINE_HOME="${DIAMOND_HOME:-$HOME/.diamond-engine}"
+GITHUB_REPO="${DIAMOND_GITHUB_REPO:-https://github.com/hypermindedd/project-quallity-engine.git}"
+GITHUB_BRANCH="${DIAMOND_GITHUB_BRANCH:-diamond/mvp}"
+DEV_SERVER_TIMEOUT="${DIAMOND_DEV_TIMEOUT:-120}"
+
+PROJECT=""
+URL=""
+NO_AUDIO=0
+FORCE_UPDATE=0
+ANALYZE_LAST=0
+DOCTOR=0
+OPEN_REPORT=1
+SMOKE=""
+STARTED_PID=""
+
+say()  { printf '💎 %s\n' "$*"; }
+warn() { printf '⚠️  %s\n' "$*" >&2; }
+die()  { local code="$1"; shift; printf '❌ %s\n' "$*" >&2; exit "$code"; }
+
+usage() { sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'; }
+
+# ------------------------------------------------------------------ arguments
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --url) [ $# -ge 2 ] || die 2 "--url needs a value"; URL="$2"; shift 2 ;;
+    --no-audio) NO_AUDIO=1; shift ;;
+    --update) FORCE_UPDATE=1; shift ;;
+    --analyze-last) ANALYZE_LAST=1; shift ;;
+    --doctor|--dry-run) DOCTOR=1; shift ;;
+    --no-open) OPEN_REPORT=0; shift ;;
+    --smoke) [ $# -ge 2 ] || die 2 "--smoke needs seconds"; SMOKE="$2"; NO_AUDIO=1; OPEN_REPORT=0; shift 2 ;;
+    --install-self)
+      mkdir -p "$HOME/.local/bin"
+      cp "$0" "$HOME/.local/bin/diamond-run" && chmod +x "$HOME/.local/bin/diamond-run"
+      say "installed: $HOME/.local/bin/diamond-run"
+      case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *)
+        warn "add ~/.local/bin to PATH, e.g.:  echo 'export PATH=\"\$HOME/.local/bin:\$PATH\"' >> ~/.zshrc" ;;
+      esac
+      exit 0 ;;
+    -h|--help) usage; exit 0 ;;
+    -*) die 2 "unknown option: $1 (see --help)" ;;
+    *) [ -z "$PROJECT" ] || die 2 "only one project directory"; PROJECT="$1"; shift ;;
+  esac
+done
+PROJECT="$(cd "${PROJECT:-.}" 2>/dev/null && pwd)" || die 2 "project directory not found: ${PROJECT:-.}"
+
+# ------------------------------------------------------------------- python
+find_python() {
+  local c
+  for c in python3.13 python3.12 python3.11 /opt/homebrew/bin/python3 /usr/local/bin/python3 python3; do
+    if command -v "$c" >/dev/null 2>&1 && "$c" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)' 2>/dev/null; then
+      command -v "$c"; return 0
+    fi
+  done
+  return 1
+}
+
+# ------------------------------------------------------------- engine source
+# Prints "kind|path|stamp" for the newest engine source found.
+newest_zip_in() {
+  # newest by modification time (Drive sets it to the upload time)
+  ls -1t "$1"/Diamondengine-src-*.zip 2>/dev/null | head -n 1 || true
+}
+
+find_engine_source() {
+  if [ -n "${DIAMOND_SRC:-}" ]; then
+    [ -f "$DIAMOND_SRC/pyproject.toml" ] || die 4 "DIAMOND_SRC has no pyproject.toml: $DIAMOND_SRC"
+    echo "folder|$DIAMOND_SRC|dev"; return 0
+  fi
+  local d z
+  for d in "${DIAMOND_DRIVE_DIR:-}" "$HOME"/Library/CloudStorage/GoogleDrive-*/"My Drive"/Diamondengine \
+           "$HOME/Google Drive/My Drive/Diamondengine" "$HOME/Documents/Diamondengine" "$HOME/Downloads/Diamondengine"; do
+    [ -n "$d" ] && [ -d "$d" ] || continue
+    z="$(newest_zip_in "$d")"
+    if [ -n "$z" ]; then echo "zip|$z|$(basename "$z")"; return 0; fi
+    if [ -f "$d/diamond/pyproject.toml" ]; then echo "folder|$d/diamond|folder"; return 0; fi
+  done
+  if command -v git >/dev/null 2>&1; then
+    echo "git|$GITHUB_REPO|$GITHUB_BRANCH"; return 0
+  fi
+  return 1
+}
+
+install_engine() {
+  local kind="$1" src="$2" stamp="$3" py target stamp_file
+  stamp_file="$ENGINE_HOME/installed.stamp"
+  target="$ENGINE_HOME/engine"
+  mkdir -p "$ENGINE_HOME"
+
+  # Resolve the stamp of a git source to its commit so updates are detected.
+  if [ "$kind" = "git" ]; then
+    stamp="git:$(git ls-remote "$src" "refs/heads/$GITHUB_BRANCH" 2>/dev/null | cut -c1-12)"
+    [ "$stamp" != "git:" ] || die 4 "cannot reach $src (branch $GITHUB_BRANCH). Put the engine zip in the Drive folder 'Diamondengine' or set DIAMOND_SRC."
+  fi
+  if [ "$kind" = "folder" ]; then target="$src"; stamp="folder:$src"; fi
+
+  if [ "$FORCE_UPDATE" -eq 0 ] && [ -f "$stamp_file" ] && [ "$(cat "$stamp_file")" = "$stamp" ] \
+     && [ -x "$ENGINE_HOME/venv/bin/diamond" ]; then
+    return 0
+  fi
+
+  say "installing engine ($stamp) …"
+  case "$kind" in
+    zip)
+      command -v unzip >/dev/null 2>&1 || die 3 "unzip is required"
+      rm -rf "$ENGINE_HOME/.unpack" "$target"
+      mkdir -p "$ENGINE_HOME/.unpack"
+      unzip -q "$src" -d "$ENGINE_HOME/.unpack"
+      [ -f "$ENGINE_HOME/.unpack/diamond/pyproject.toml" ] || die 4 "zip does not contain diamond/pyproject.toml: $src"
+      mv "$ENGINE_HOME/.unpack/diamond" "$target"
+      rm -rf "$ENGINE_HOME/.unpack" ;;
+    git)
+      rm -rf "$ENGINE_HOME/.clone" "$target"
+      git clone -q --depth 1 -b "$GITHUB_BRANCH" "$src" "$ENGINE_HOME/.clone" || die 4 "git clone failed"
+      mv "$ENGINE_HOME/.clone/diamond" "$target"
+      rm -rf "$ENGINE_HOME/.clone" ;;
+    folder) ;;
+  esac
+
+  if [ ! -x "$ENGINE_HOME/venv/bin/python" ]; then
+    py="$(find_python)" || {
+      if command -v brew >/dev/null 2>&1; then die 3 "Python 3.11+ is required. Run:  brew install python@3.12"; fi
+      die 3 "Python 3.11+ is required (install from python.org or Homebrew)."
+    }
+    "$py" -m venv "$ENGINE_HOME/venv"
+  fi
+  local extras="${DIAMOND_EXTRAS:-}"
+  if [ -z "$extras" ]; then
+    extras="mac"
+    [ "$(uname -s)" = "Darwin" ] || extras="audio,stt-faster,mcp"
+  fi
+  "$ENGINE_HOME/venv/bin/python" -m pip install -q --upgrade pip
+  if [ "$kind" = "folder" ]; then
+    "$ENGINE_HOME/venv/bin/python" -m pip install -q -e "${target}[${extras}]"
+  else
+    "$ENGINE_HOME/venv/bin/python" -m pip install -q "${target}[${extras}]"
+  fi
+  "$ENGINE_HOME/venv/bin/python" -m playwright install chromium >/dev/null 2>"$ENGINE_HOME/playwright-install.log" \
+    || die 3 "could not download the Chromium browser (network/VPN?). Details: $ENGINE_HOME/playwright-install.log"
+  echo "$stamp" > "$stamp_file"
+  say "engine ready."
+}
+
+# --------------------------------------------------------- dev server detection
+pkg_field() {  # pkg_field <expr> — evaluate a tiny python expression over package.json
+  "${PY_FOR_JSON}" - "$PROJECT/package.json" "$1" <<'PYEOF' 2>/dev/null || true
+import json, sys
+pkg = json.load(open(sys.argv[1], encoding="utf-8"))
+deps = {**pkg.get("dependencies", {}), **pkg.get("devDependencies", {})}
+scripts = pkg.get("scripts", {})
+expr = sys.argv[2]
+if expr == "framework":
+    for name, fw in (("next", "next"), ("nuxt", "nuxt"), ("astro", "astro"), ("@sveltejs/kit", "sveltekit"),
+                     ("@remix-run/dev", "remix"), ("gatsby", "gatsby"), ("@angular/core", "angular"),
+                     ("react-scripts", "cra"), ("vite", "vite")):
+        if name in deps:
+            print(fw); break
+elif expr == "script":
+    for name in ("dev", "start", "serve"):
+        if name in scripts:
+            print(name); break
+PYEOF
+}
+
+default_port() {
+  case "$1" in
+    next|nuxt|cra|remix) echo 3000 ;;
+    vite|sveltekit) echo 5173 ;;
+    astro) echo 4321 ;;
+    angular) echo 4200 ;;
+    gatsby) echo 8000 ;;
+    *) echo 3000 ;;
+  esac
+}
+
+package_manager() {
+  if [ -f "$PROJECT/pnpm-lock.yaml" ]; then echo pnpm
+  elif [ -f "$PROJECT/yarn.lock" ]; then echo yarn
+  elif [ -f "$PROJECT/bun.lockb" ] || [ -f "$PROJECT/bun.lock" ]; then echo bun
+  else echo npm; fi
+}
+
+url_up() { curl -s -o /dev/null -m 3 "$1"; }
+
+free_port() { "${PY_FOR_JSON}" -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1",0)); print(s.getsockname()[1])'; }
+
+cleanup() {
+  if [ -n "$STARTED_PID" ] && kill -0 "$STARTED_PID" 2>/dev/null; then
+    say "stopping the dev server Diamond started …"
+    kill -TERM -- "-$STARTED_PID" 2>/dev/null || kill -TERM "$STARTED_PID" 2>/dev/null || true
+  fi
+}
+trap cleanup EXIT INT TERM
+
+start_dev_server() {
+  local fw script pm port log
+  fw="$(pkg_field framework)"; script="$(pkg_field script)"
+  [ -n "$script" ] || die 5 "package.json has no dev/start/serve script; pass --url"
+  pm="$(package_manager)"; port="$(default_port "$fw")"
+  if url_up "http://localhost:$port"; then
+    URL="http://localhost:$port"; say "dev server already running: $URL"; return 0
+  fi
+  command -v "$pm" >/dev/null 2>&1 || die 3 "$pm is not installed (needed to start the dev server)"
+  if [ ! -d "$PROJECT/node_modules" ]; then
+    say "installing project dependencies with $pm (first run only) …"
+    (cd "$PROJECT" && "$pm" install) || die 5 "$pm install failed"
+  fi
+  mkdir -p "$PROJECT/.diamond"
+  log="$PROJECT/.diamond/devserver.log"
+  say "starting dev server: $pm run $script (${fw:-unknown framework}) …"
+  set -m  # own process group, so cleanup stops the whole tree
+  (cd "$PROJECT" && exec "$pm" run "$script") >"$log" 2>&1 &
+  STARTED_PID=$!
+  set +m
+  local waited=0 seen=""
+  while [ "$waited" -lt "$DEV_SERVER_TIMEOUT" ]; do
+    kill -0 "$STARTED_PID" 2>/dev/null || die 5 "dev server exited; see $log"
+    seen="$(grep -Eo 'https?://(localhost|127\.0\.0\.1|0\.0\.0\.0):[0-9]+' "$log" 2>/dev/null | head -n 1 | sed 's/0\.0\.0\.0/localhost/' || true)"
+    [ -n "$seen" ] || seen="http://localhost:$port"
+    if url_up "$seen"; then URL="$seen"; say "dev server is up: $URL"; return 0; fi
+    sleep 2; waited=$((waited + 2))
+  done
+  die 5 "dev server did not answer within ${DEV_SERVER_TIMEOUT}s; see $log"
+}
+
+start_static_server() {
+  local root="$1" port
+  port="$(free_port)"
+  say "serving static files from $root on port $port …"
+  set -m
+  (cd "$root" && exec "${PY_FOR_JSON}" -m http.server "$port" --bind 127.0.0.1) >/dev/null 2>&1 &
+  STARTED_PID=$!
+  set +m
+  local i=0
+  while [ $i -lt 20 ]; do url_up "http://127.0.0.1:$port/" && break; sleep 0.5; i=$((i + 1)); done
+  URL="http://127.0.0.1:$port/"
+}
+
+detect_target() {  # prints a description; sets PLAN for --doctor
+  if [ -n "$URL" ]; then echo "url:$URL"; return; fi
+  if [ -f "$PROJECT/package.json" ]; then
+    local fw script; fw="$(pkg_field framework)"; script="$(pkg_field script)"
+    echo "node:${fw:-unknown}:${script:-none}:$(package_manager):port $(default_port "$fw")"; return
+  fi
+  local d
+  for d in "$PROJECT" "$PROJECT/public" "$PROJECT/dist" "$PROJECT/build" "$PROJECT/out"; do
+    if [ -f "$d/index.html" ]; then echo "static:$d"; return; fi
+  done
+  echo "unknown"
+}
+
+ensure_gitignore() {
+  [ -d "$PROJECT/.git" ] || return 0
+  if [ ! -f "$PROJECT/.gitignore" ] || ! grep -qxF ".diamond/" "$PROJECT/.gitignore"; then
+    printf '\n# Diamond review sessions (local, may contain voice recordings)\n.diamond/\n' >> "$PROJECT/.gitignore"
+    say "added .diamond/ to the project's .gitignore"
+  fi
+}
+
+# ======================================================================= main
+PY_FOR_JSON="$(find_python || command -v python3 || true)"
+[ -n "$PY_FOR_JSON" ] || die 3 "python3 not found"
+
+SOURCE="$(find_engine_source)" || die 4 "engine not found: no Drive folder 'Diamondengine', no DIAMOND_SRC, and git is unavailable"
+KIND="${SOURCE%%|*}"; REST="${SOURCE#*|}"; SRC="${REST%%|*}"; STAMP="${REST#*|}"
+TARGET="$(detect_target)"
+
+if [ "$DOCTOR" -eq 1 ]; then
+  echo "project:       $PROJECT"
+  echo "engine source: $KIND → $SRC ($STAMP)"
+  echo "engine home:   $ENGINE_HOME (installed: $( [ -x "$ENGINE_HOME/venv/bin/diamond" ] && cat "$ENGINE_HOME/installed.stamp" 2>/dev/null || echo no))"
+  echo "python:        $(find_python || echo 'MISSING (need 3.11+)')"
+  echo "target:        $TARGET"
+  echo "microphone:    $( [ "$NO_AUDIO" -eq 1 ] && echo off || echo on )"
+  echo "mode:          $( [ -n "$SMOKE" ] && echo "automatic ${SMOKE}s" || echo narrated )"
+  exit 0
+fi
+
+install_engine "$KIND" "$SRC" "$STAMP"
+DIAMOND="$ENGINE_HOME/venv/bin/diamond"
+
+if [ "$ANALYZE_LAST" -eq 1 ]; then
+  LAST="$(ls -1d "$PROJECT"/.diamond/sessions/*/ 2>/dev/null | sort | tail -n 1)"
+  [ -n "$LAST" ] || die 2 "no sessions in $PROJECT/.diamond/sessions"
+  "$DIAMOND" analyze "$LAST" --repo "$PROJECT"
+else
+  ensure_gitignore
+  if [ -z "$URL" ]; then
+    case "$TARGET" in
+      node:*) start_dev_server ;;
+      static:*) start_static_server "${TARGET#static:}" ;;
+      *) die 5 "could not tell how to run this project; pass --url http://localhost:PORT" ;;
+    esac
+  fi
+  set -- review "$URL" --repo "$PROJECT"
+  [ "$NO_AUDIO" -eq 1 ] && set -- "$@" --no-audio
+  if [ -n "$SMOKE" ]; then
+    set -- "$@" --headless --duration "$SMOKE"
+    say "automatic pass (${SMOKE}s, headless) …"
+  else
+    say "opening the review window — talk while pointing; Alt+Shift+M marks an element; close the window to finish."
+  fi
+  (cd "$PROJECT" && "$DIAMOND" "$@")
+fi
+
+REPORT="$(ls -1d "$PROJECT"/.diamond/sessions/*/ 2>/dev/null | sort | tail -n 1)report.md"
+if [ -f "$REPORT" ]; then
+  say "report: $REPORT"
+  if [ "$OPEN_REPORT" -eq 1 ] && command -v open >/dev/null 2>&1; then open "$REPORT" || true; fi
+fi

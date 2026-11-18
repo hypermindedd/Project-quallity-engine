@@ -6,6 +6,7 @@ import argparse
 import json
 import logging
 import sys
+import time
 from pathlib import Path
 
 from .config import load_config
@@ -17,14 +18,23 @@ def _cmd_review(args: argparse.Namespace) -> int:
 
     repo = Path(args.repo).resolve() if args.repo else None
     cfg = load_config(repo)
-    session = ReviewSession(cfg, args.url, repo=repo, audio=not args.no_audio)
+    session = ReviewSession(cfg, args.url, repo=repo, audio=not args.no_audio and not args.headless,
+                            headless=args.headless)
     session.start()
     print(f"💎 Diamond is recording → {session.store.root}")
     print(f"   microphone: {session.audio_status}")
-    print("   talk while pointing; Alt+Shift+M marks the element under the mouse.")
-    print("   close the browser window (or Ctrl+C) to finish.")
+    if args.duration:
+        print(f"   automatic pass: {args.duration:g}s, no interaction")
+    else:
+        print("   talk while pointing; Alt+Shift+M marks the element under the mouse.")
+        print("   close the browser window (or Ctrl+C) to finish.")
     try:
-        root = session.wait()
+        if args.duration:
+            # Automatic pass: the page is visited, inventoried and measured without a human.
+            time.sleep(args.duration)
+            root = session.stop()
+        else:
+            root = session.wait()
     except KeyboardInterrupt:
         root = session.stop()
     if args.no_analyze:
@@ -65,6 +75,8 @@ def main(argv: list[str] | None = None) -> int:
     review.add_argument("--repo", help="path of the project's source (enables root-cause tracing)")
     review.add_argument("--no-audio", action="store_true", help="record without the microphone")
     review.add_argument("--no-analyze", action="store_true")
+    review.add_argument("--headless", action="store_true", help="no visible window (automatic passes / CI)")
+    review.add_argument("--duration", type=float, default=0, help="stop automatically after N seconds")
     review.set_defaults(func=_cmd_review)
 
     an = sub.add_parser("analyze", help="analyze a recorded session directory")
