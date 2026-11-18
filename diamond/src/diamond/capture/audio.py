@@ -28,7 +28,9 @@ class MicRecorder:
         self._stream = None
         self._wav: wave.Wave_write | None = None
         self._start_ms: float | None = None
+        self._clock_offset = 0.0
         self._lock = threading.Lock()
+        self._stopping = threading.Event()
 
     def start(self) -> None:
         try:
@@ -45,25 +47,48 @@ class MicRecorder:
         self._wav.setsampwidth(2)
         self._wav.setframerate(SAMPLE_RATE)
 
+        stopping = self._stopping
+
         def callback(indata, frames, time_info, status):  # noqa: ARG001 - PortAudio signature
+            # Runs on CoreAudio's thread. Never touch the stream object or block here:
+            # calling stream methods from the callback deadlocks Pa_StopStream on macOS.
+            if stopping.is_set():
+                raise sd.CallbackStop
+            if self._start_ms is None:
+                self._start_ms = (time_info.inputBufferAdcTime + self._clock_offset) * 1000
             with self._lock:
-                if self._start_ms is None:
-                    # stream clock → wall clock at the moment the first block was digitised
-                    offset = time.time() - self._stream.time
-                    self._start_ms = (time_info.inputBufferAdcTime + offset) * 1000
                 if self._wav is not None:
                     self._wav.writeframes(bytes(indata))
 
         self._stream = sd.RawInputStream(samplerate=SAMPLE_RATE, channels=1, dtype="int16",
                                          device=self.device, callback=callback)
+        # stream clock → wall clock, measured once on the caller's thread
+        self._clock_offset = time.time() - self._stream.time
         self._stream.start()
+        self._write_meta()  # audio.json exists even if the process dies mid-session
+
+    def _write_meta(self) -> None:
+        self.store.write_json("audio.json", {"start_epoch_ms": self._start_ms or time.time() * 1000,
+                                             "samplerate": SAMPLE_RATE})
 
     def stop(self) -> None:
-        if self._stream is not None:
-            self._stream.stop()
-            self._stream.close()
+        """Stop without ever hanging: ask the callback to stop, then abort with a deadline."""
+        self._stopping.set()
+        stream = self._stream
+        if stream is not None:
+            done = threading.Event()
+
+            def _close() -> None:
+                try:
+                    stream.abort()  # abort, not stop: no waiting for buffers to drain
+                    stream.close()
+                finally:
+                    done.set()
+
+            threading.Thread(target=_close, name="diamond-mic-close", daemon=True).start()
+            done.wait(timeout=3)
         with self._lock:
             if self._wav is not None:
-                self._wav.close()
+                self._wav.close()  # writes the correct WAV header
                 self._wav = None
-        self.store.write_json("audio.json", {"start_epoch_ms": self._start_ms, "samplerate": SAMPLE_RATE})
+        self._write_meta()

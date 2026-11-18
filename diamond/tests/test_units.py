@@ -149,3 +149,22 @@ def test_config_override_records_provenance(tmp_path: Path):
     (tmp_path / ".diamond.toml").write_text("[thresholds]\nnope = 1\n", encoding="utf-8")
     with pytest.raises(ValueError):
         load_config(tmp_path)
+
+
+def test_repair_wav_written_by_a_killed_process(tmp_path):
+    import wave
+
+    from diamond.speech.base import repair_wav
+    wav = tmp_path / "audio.wav"
+    w = wave.open(str(wav), "wb")
+    w.setnchannels(1)
+    w.setsampwidth(2)
+    w.setframerate(16000)
+    w.writeframes(b"")  # header is written now, with 0 frames
+    w._file.flush()     # …and the process is killed before close() patches it
+    with open(wav, "ab") as fh:
+        fh.write(b"\x01\x00" * 16000)
+    assert repair_wav(wav)
+    with wave.open(str(wav), "rb") as r:
+        assert r.getnframes() == 16000
+    assert not repair_wav(wav)

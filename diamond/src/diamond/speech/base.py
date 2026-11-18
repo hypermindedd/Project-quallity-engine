@@ -112,12 +112,46 @@ def get_transcriber(provider: str) -> Transcriber:
     return cls()
 
 
+def repair_wav(wav: Path) -> bool:
+    """Fix the header of a WAV whose writer never closed (crash/kill mid-session).
+
+    The PCM data is intact; only the frame count in the header is zero. Returns
+    True when the file was repaired.
+    """
+    import wave
+
+    try:
+        with wave.open(str(wav), "rb") as r:
+            if r.getnframes() > 0:
+                return False
+            channels, width, rate = r.getnchannels(), r.getsampwidth(), r.getframerate()
+    except (wave.Error, EOFError):
+        channels, width, rate = 1, 2, 16_000
+    raw = wav.read_bytes()
+    data = raw[44:]
+    data = data[: len(data) // (channels * width) * (channels * width)]
+    if not data:
+        return False
+    with wave.open(str(wav), "wb") as w:
+        w.setnchannels(channels)
+        w.setsampwidth(width)
+        w.setframerate(rate)
+        w.writeframes(data)
+    return True
+
+
 def transcribe_session(store: SessionStore, cfg: SpeechConfig) -> list[Word]:
     """Transcribe ``audio.wav`` and store ``transcript.json`` with epoch-ms words."""
     wav = store.root / "audio.wav"
     audio = store.read_json("audio.json", {})
-    if not wav.is_file() or not audio.get("start_epoch_ms"):
+    if not wav.is_file():
         raise TranscriptionUnavailable("this session has no audio recording")
+    if not audio.get("start_epoch_ms"):
+        # Older sessions killed mid-way: the mic starts right after the session is created.
+        audio = {"start_epoch_ms": store.meta.get("started_ms"), "reconstructed": True}
+        if not audio["start_epoch_ms"]:
+            raise TranscriptionUnavailable("audio start time unknown")
+    repair_wav(wav)
     transcriber = get_transcriber(cfg.provider)
     t0 = float(audio["start_epoch_ms"])
     words = [Word(text.strip(), t0 + s * 1000, t0 + e * 1000, float(p))

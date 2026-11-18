@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "diamond-engine"
-version = "0.1.1"
+version = "0.1.2"
 description = "Diamond — narrated design & code review engine: voice + pointer + page inspection → root cause → fix brief"
 readme = "README.md"
 requires-python = ">=3.11"

@@ -9,7 +9,8 @@
 #                         → ~/Documents/Diamondengine → GitHub branch diamond/mvp
 #   2. installs/updates it in ~/.diamond-engine (own venv; never touches system Python)
 #   3. finds or starts the project's dev server (Next, Vite, Nuxt, Astro, SvelteKit,
-#      CRA, Angular, Gatsby, Remix, plain HTML) and waits until it answers
+#      CRA, Angular, Gatsby, Remix, FastAPI, Flask, Django, plain HTML) and waits
+#      until it answers
 #   4. opens the narrated review; when the window closes it analyses the session
 #   5. opens the Persian report and stops the dev server it started
 #
@@ -210,6 +211,96 @@ elif expr == "script":
 PYEOF
 }
 
+# Python web apps: prints "fastapi|module:var", "flask|module" or "django|manage.py".
+py_web_target() {
+  "${PY_FOR_JSON}" - "$PROJECT" <<'PYEOF' 2>/dev/null || true
+import os, re, sys
+root = sys.argv[1]
+skip = {".venv", "venv", "env", "node_modules", ".git", "tests", "test", "site-packages", ".diamond", "build", "dist"}
+if os.path.isfile(os.path.join(root, "manage.py")):
+    print("django|manage.py"); sys.exit()
+fastapi = re.compile(r"^(\w+)\s*(?::[^=\n]*)?=\s*FastAPI\(", re.M)
+flask = re.compile(r"^(\w+)\s*(?::[^=\n]*)?=\s*Flask\(", re.M)
+found = []
+for d, dirs, files in os.walk(root):
+    dirs[:] = [x for x in dirs if x not in skip and not x.startswith(".")]
+    if d[len(root):].count(os.sep) > 3:
+        continue
+    for f in files:
+        if not f.endswith(".py"):
+            continue
+        path = os.path.join(d, f)
+        try:
+            text = open(path, encoding="utf-8", errors="ignore").read()
+        except OSError:
+            continue
+        module = os.path.relpath(path, root)[:-3].replace(os.sep, ".")
+        m = fastapi.search(text)
+        if m:
+            found.append((0 if f in ("app.py", "main.py", "server.py", "api.py") else 1, "fastapi|%s:%s" % (module, m.group(1))))
+        m = flask.search(text)
+        if m:
+            found.append((2, "flask|%s" % module))
+if found:
+    print(sorted(found)[0][1])
+PYEOF
+}
+
+# Project virtualenv: reuse .venv/venv, else create .venv and install requirements once.
+project_python() {
+  local py stamp req_hash
+  for py in "$PROJECT/.venv/bin/python" "$PROJECT/venv/bin/python"; do
+    [ -x "$py" ] && break
+    py=""
+  done
+  if [ -z "$py" ]; then
+    say "creating the project's virtual environment (.venv) …" >&2
+    "$(find_python)" -m venv "$PROJECT/.venv" >&2 || die 3 "could not create $PROJECT/.venv"
+    py="$PROJECT/.venv/bin/python"
+  fi
+  if [ -f "$PROJECT/requirements.txt" ]; then
+    stamp="$(dirname "$py")/../.diamond_requirements"
+    req_hash="$("$py" -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$PROJECT/requirements.txt")"
+    if [ "$(cat "$stamp" 2>/dev/null || true)" != "$req_hash" ]; then
+      say "installing the project's Python requirements (first run only) …" >&2
+      "$py" -m pip install -q -r "$PROJECT/requirements.txt" >&2 || die 5 "pip install -r requirements.txt failed"
+      echo "$req_hash" > "$stamp"
+    fi
+  fi
+  echo "$py"
+}
+
+start_python_server() {
+  local kind="${1%%|*}" target="${1#*|}" py port log
+  py="$(project_python)"
+  port="$(free_port)"
+  mkdir -p "$PROJECT/.diamond"
+  log="$PROJECT/.diamond/devserver.log"
+  case "$kind" in
+    fastapi)
+      "$py" -c 'import uvicorn' 2>/dev/null || "$py" -m pip install -q uvicorn >&2
+      set -- "$py" -m uvicorn "$target" --host 127.0.0.1 --port "$port" ;;
+    flask)
+      set -- "$py" -m flask --app "$target" run --host 127.0.0.1 --port "$port" ;;
+    django)
+      set -- "$py" manage.py runserver "127.0.0.1:$port" ;;
+    *) die 5 "unknown Python server kind: $kind" ;;
+  esac
+  say "starting $kind server ($target) on port $port …"
+  set -m
+  (cd "$PROJECT" && exec "$@") >"$log" 2>&1 &
+  STARTED_PID=$!
+  set +m
+  local waited=0
+  URL="http://127.0.0.1:$port"
+  while [ "$waited" -lt "$DEV_SERVER_TIMEOUT" ]; do
+    kill -0 "$STARTED_PID" 2>/dev/null || die 5 "$kind server exited; see $log"
+    if url_up "$URL/"; then say "server is up: $URL"; return 0; fi
+    sleep 1; waited=$((waited + 1))
+  done
+  die 5 "$kind server did not answer within ${DEV_SERVER_TIMEOUT}s; see $log"
+}
+
 default_port() {
   case "$1" in
     next|nuxt|cra|remix) echo 3000 ;;
@@ -290,7 +381,9 @@ detect_target() {  # prints a description; sets PLAN for --doctor
     local fw script; fw="$(pkg_field framework)"; script="$(pkg_field script)"
     echo "node:${fw:-unknown}:${script:-none}:$(package_manager):port $(default_port "$fw")"; return
   fi
-  local d
+  local d py
+  py="$(py_web_target)"
+  if [ -n "$py" ]; then echo "python:$py"; return; fi
   for d in "$PROJECT" "$PROJECT/public" "$PROJECT/dist" "$PROJECT/build" "$PROJECT/out"; do
     if [ -f "$d/index.html" ]; then echo "static:$d"; return; fi
   done
@@ -340,6 +433,7 @@ else
   if [ -z "$URL" ]; then
     case "$TARGET" in
       node:*) start_dev_server ;;
+      python:*) start_python_server "${TARGET#python:}" ;;
       static:*) start_static_server "${TARGET#static:}" ;;
       *) die 5 "could not tell how to run this project; pass --url http://localhost:PORT" ;;
     esac

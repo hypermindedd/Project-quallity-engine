@@ -65,3 +65,19 @@ def test_engine_found_in_synced_drive_folder(tmp_path):
 def test_falls_back_to_github(tmp_path):
     info = doctor(tmp_path, tmp_path)
     assert info["engine source"].strip().startswith("git → https://github.com/hypermindedd/")
+
+
+@pytest.mark.parametrize("files, expected", [
+    ({"server/app.py": "from fastapi import FastAPI\napp = FastAPI()\n"}, "python:fastapi|server.app:app"),
+    ({"main.py": "from fastapi import FastAPI\napi: FastAPI = FastAPI(title='x')\n"}, "python:fastapi|main:api"),
+    ({"web.py": "from flask import Flask\napplication = Flask(__name__)\n"}, "python:flask|web"),
+    ({"manage.py": "", "mysite/settings.py": ""}, "python:django|manage.py"),
+    ({".venv/lib/x.py": "app = FastAPI()\n", "index.html": "<h1>x</h1>"}, "static:{project}"),
+])
+def test_detects_python_web_apps(tmp_path, files, expected):
+    project = tmp_path / "proj"
+    for rel, text in files.items():
+        (project / rel).parent.mkdir(parents=True, exist_ok=True)
+        (project / rel).write_text(text)
+    info = doctor(project, tmp_path, DIAMOND_SRC=str(ENGINE))
+    assert info["target"].strip() == expected.format(project=project)
