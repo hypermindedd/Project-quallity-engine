@@ -242,3 +242,19 @@ def test_parallel_resumable_model_fetch(tmp_path, monkeypatch):
         server.shutdown()
     assert (path / "weights.safetensors").read_bytes() == blob
     assert models.local_model("org/m") == path
+
+
+def test_load_wav_without_ffmpeg(tmp_path):
+    import wave
+
+    import numpy as np
+
+    from diamond.speech.base import load_wav
+    wav = tmp_path / "a.wav"
+    with wave.open(str(wav), "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(16000)
+        w.writeframes((np.array([0, 16384, -32768], dtype=np.int16)).tobytes())
+    samples = load_wav(wav)
+    assert samples.dtype == np.float32 and list(samples) == [0.0, 0.5, -1.0]

@@ -30,6 +30,29 @@ class TranscriptionUnavailable(RuntimeError):
     pass
 
 
+def load_wav(wav: Path):
+    """16 kHz mono float32 samples in [-1, 1], read without ffmpeg.
+
+    Whisper libraries shell out to ffmpeg when given a path; Diamond records its
+    own 16 kHz/16-bit mono WAV, so decoding it here removes that dependency.
+    """
+    import wave
+
+    import numpy as np
+
+    with wave.open(str(wav), "rb") as r:
+        if r.getsampwidth() != 2:
+            raise TranscriptionUnavailable(f"unsupported WAV sample width: {r.getsampwidth()}")
+        rate, channels = r.getframerate(), r.getnchannels()
+        samples = np.frombuffer(r.readframes(r.getnframes()), dtype=np.int16).astype(np.float32) / 32768.0
+    if channels > 1:
+        samples = samples.reshape(-1, channels).mean(axis=1)
+    if rate != 16_000:  # linear resample; Diamond's own recordings are already 16 kHz
+        n = int(len(samples) * 16_000 / rate)
+        samples = np.interp(np.linspace(0, len(samples) - 1, n), np.arange(len(samples)), samples).astype(np.float32)
+    return samples
+
+
 class Transcriber(Protocol):
     name: str
 
@@ -51,7 +74,7 @@ class MlxTranscriber:
 
         local = local_model(cfg.model)  # verified copy from `diamond fetch-model`
         repo = str(local) if local else (cfg.model if "/" in cfg.model else f"mlx-community/whisper-{cfg.model}")
-        result = mlx_whisper.transcribe(str(wav), path_or_hf_repo=repo, language=cfg.language,
+        result = mlx_whisper.transcribe(load_wav(wav), path_or_hf_repo=repo, language=cfg.language,
                                         word_timestamps=True, initial_prompt=_prompt(cfg))
         return [(w["word"], w["start"], w["end"], w.get("probability", 1.0))
                 for seg in result.get("segments", []) for w in seg.get("words", [])]
@@ -64,7 +87,7 @@ class FasterTranscriber:
         from faster_whisper import WhisperModel  # type: ignore[import-not-found]
 
         model = WhisperModel(cfg.model, device="auto", compute_type="int8")
-        segments, _ = model.transcribe(str(wav), language=cfg.language, word_timestamps=True,
+        segments, _ = model.transcribe(load_wav(wav), language=cfg.language, word_timestamps=True,
                                        initial_prompt=_prompt(cfg), vad_filter=True)
         return [(w.word, w.start, w.end, w.probability) for seg in segments for w in (seg.words or [])]
 
