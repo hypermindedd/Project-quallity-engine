@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "diamond-engine"
+version = "0.1.0"
+description = "Diamond — narrated design & code review engine: voice + pointer + page inspection → root cause → fix brief"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [{ name = "A.del" }]
+# The core has exactly one hard dependency: the browser driver.
+dependencies = ["playwright>=1.48"]
+
+[project.optional-dependencies]
+# Microphone capture (needs PortAudio: `brew install portaudio` on macOS).
+audio = ["sounddevice>=0.5", "numpy>=1.26"]
+# Speech-to-text providers. Pick one; `auto` uses the first that is installed.
+stt-mlx = ["mlx-whisper>=0.4"]            # Apple Silicon, Metal-accelerated (recommended on Mac)
+stt-faster = ["faster-whisper>=1.1"]      # CPU/CUDA, any OS
+mcp = ["mcp>=1.2"]
+mac = ["diamond-engine[audio,stt-mlx,mcp]"]
+dev = ["pytest>=8", "ruff>=0.14"]
+
+[project.scripts]
+diamond = "diamond.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+diamond = ["capture/*.js"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 140
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "I", "UP", "S"]
+ignore = ["S101", "S603", "S607", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S"]

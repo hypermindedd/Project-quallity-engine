@@ -1,0 +1,37 @@
+# Diamond engine CI. Lives in the PQE repo only until Diamond moves to its own
+# repository (see diamond/docs/ARCHITECTURE.md §9); runs only when diamond/ changes.
+name: Diamond engine CI
+
+on:
+  push:
+    branches: [main, "diamond/**"]
+    paths: ["diamond/**", ".github/workflows/diamond.yml"]
+  pull_request:
+    paths: ["diamond/**", ".github/workflows/diamond.yml"]
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: diamond
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install engine
+        run: python -m pip install -e '.[dev,mcp]'
+      - name: Install Chromium
+        run: python -m playwright install --with-deps chromium
+      - name: Lint
+        run: ruff check src tests
+      - name: Tests (unit + real-browser end-to-end)
+        run: python -m pytest -q

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fa">
+<head>
+<meta charset="utf-8">
+<title>فروشگاه نمونه</title>
+<style>
+  body { font-family: Tahoma, sans-serif; margin: 0; padding: 16px; }
+  .muted { color: #b5b5b5; font-size: 14px; }
+  .btn-a { background: #1a73e8; color: #fff; border: 0; border-radius: 8px; padding: 10px 16px; font-size: 14px; }
+  .btn-b { background: #1c76eb; color: #fff; border: 0; border-radius: 4px; padding: 6px 10px; font-size: 13px; }
+  .btn-c { background: #1e78ed; color: #fff; border: 0; border-radius: 20px; padding: 12px 22px; font-size: 16px; font-weight: 700; }
+  .btn-d { background: #333; color: #fff; border: 0; border-radius: 0; padding: 8px 9px; font-size: 15px; }
+  .btn-e { background: #e8eef9; color: #1a73e8; border: 0; border-radius: 6px; padding: 7px 13px; font-size: 12px; }
+  .fake { display: inline-block; cursor: pointer; background: #f3f3f3; padding: 9px 15px; border-radius: 3px; }
+  .bar { width: 40px; height: 6px; background: #1a73e8; transition: width 900ms ease; }
+  .bar:hover { width: 300px; }
+  .icon { width: 18px; height: 18px; padding: 0; border: 0; background: #ddd; }
+  h1 { font-size: 27px; } h2 { font-size: 21px; } h3 { font-size: 17px; } small { font-size: 11px; }
+  .s1 { font-size: 19px; } .s2 { font-size: 23px; } .s3 { font-size: 10px; } .s4 { font-size: 31px; }
+</style>
+</head>
+<body>
+  <h1>فروشگاه نمونه</h1>
+  <p class="muted" id="hint">این متن کمرنگ است و خوانا نیست</p>
+  <div id="banner-slot"></div>
+  <h2>محصولات ویژه</h2>
+  <p class="s1">توضیح ۱</p><p class="s2">توضیح ۲</p><p class="s3">توضیح ۳</p><p class="s4">توضیح ۴</p><h3>زیرعنوان</h3><small>کوچک</small>
+  <div>
+    <button class="btn-a" id="save" data-insp-path="src/components/Hero.tsx:12:5:button">ذخیره</button>
+    <button class="btn-b" id="heavy">محاسبه</button>
+    <button class="btn-c">خرید</button>
+    <button class="btn-d">بعدی</button>
+    <button class="btn-e">جزئیات</button>
+    <button class="icon" id="close"></button>
+    <span class="fake" id="fake-buy">افزودن به سبد</span>
+  </div>
+  <div class="bar" id="progress"></div>
+  <p>قیمت: 120000 تومان</p>
+  <a href="page2.html" id="next-page">صفحه بعد</a>
+<script>
+  document.getElementById('save').addEventListener('click', (e) => { e.target.textContent = 'ذخیره شد'; });
+  document.getElementById('heavy').addEventListener('click', () => {
+    const end = performance.now() + 320; while (performance.now() < end) { /* block the main thread */ }
+    document.getElementById('heavy').dataset.done = '1';
+  });
+  setTimeout(() => {  // late banner pushes content down: layout shift without user input
+    const b = document.createElement('div');
+    b.style.cssText = 'height:360px;background:#ffe9a8';
+    b.textContent = 'تخفیف ویژه!';
+    document.getElementById('banner-slot').appendChild(b);
+  }, 400);
+</script>
+</body>
+</html>
