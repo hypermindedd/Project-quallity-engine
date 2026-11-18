@@ -89,6 +89,16 @@ find_python() {
   return 1
 }
 
+# Google Chrome already on the machine: used instead of downloading Chromium,
+# whose download host may be blocked or slow on some networks.
+installed_chrome() {
+  local c
+  for c in "/Applications/Google Chrome.app" "$HOME/Applications/Google Chrome.app" /usr/bin/google-chrome /usr/bin/google-chrome-stable; do
+    if [ -e "$c" ]; then echo "$c"; return 0; fi
+  done
+  return 0
+}
+
 # ------------------------------------------------------------- engine source
 # Prints "kind|path|stamp" for the newest engine source found.
 newest_zip_in() {
@@ -169,8 +179,12 @@ install_engine() {
   else
     "$ENGINE_HOME/venv/bin/python" -m pip install -q "${target}[${extras}]"
   fi
-  "$ENGINE_HOME/venv/bin/python" -m playwright install chromium >/dev/null 2>"$ENGINE_HOME/playwright-install.log" \
-    || die 3 "could not download the Chromium browser (network/VPN?). Details: $ENGINE_HOME/playwright-install.log"
+  if [ -n "$(installed_chrome)" ]; then
+    say "using the installed Google Chrome (no browser download needed)"
+  else
+    "$ENGINE_HOME/venv/bin/python" -m playwright install chromium >/dev/null 2>"$ENGINE_HOME/playwright-install.log" \
+      || die 3 "could not download the Chromium browser (network/VPN?). Install Google Chrome, or see $ENGINE_HOME/playwright-install.log"
+  fi
   echo "$stamp" > "$stamp_file"
   say "engine ready."
 }
@@ -304,6 +318,7 @@ if [ "$DOCTOR" -eq 1 ]; then
   echo "engine source: $KIND → $SRC ($STAMP)"
   echo "engine home:   $ENGINE_HOME (installed: $( [ -x "$ENGINE_HOME/venv/bin/diamond" ] && cat "$ENGINE_HOME/installed.stamp" 2>/dev/null || echo no))"
   echo "python:        $(find_python || echo 'MISSING (need 3.11+)')"
+  echo "browser:       $( [ -n "$(installed_chrome)" ] && echo "installed Google Chrome" || echo "Chromium (downloaded on first run)")"
   echo "target:        $TARGET"
   echo "microphone:    $( [ "$NO_AUDIO" -eq 1 ] && echo off || echo on )"
   echo "mode:          $( [ -n "$SMOKE" ] && echo "automatic ${SMOKE}s" || echo narrated )"
@@ -312,6 +327,9 @@ fi
 
 install_engine "$KIND" "$SRC" "$STAMP"
 DIAMOND="$ENGINE_HOME/venv/bin/diamond"
+if [ -z "${DIAMOND_BROWSER_CHANNEL:-}" ] && [ -n "$(installed_chrome)" ]; then
+  export DIAMOND_BROWSER_CHANNEL=chrome
+fi
 
 if [ "$ANALYZE_LAST" -eq 1 ]; then
   LAST="$(ls -1d "$PROJECT"/.diamond/sessions/*/ 2>/dev/null | sort | tail -n 1)"

@@ -126,6 +126,9 @@ def load_config(repo: Path | None = None, path: Path | None = None) -> DiamondCo
     if candidate and candidate.is_file():
         with candidate.open("rb") as fh:
             _apply(cfg, tomllib.load(fh))
+    # The launcher sets this when it uses the already-installed Google Chrome
+    # instead of downloading Chromium (the download host can be unreachable).
+    cfg.browser_channel = os.environ.get("DIAMOND_BROWSER_CHANNEL", cfg.browser_channel)
     return cfg
 
 
