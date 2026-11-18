@@ -28,6 +28,12 @@ def _cmd_review(args: argparse.Namespace) -> int:
     else:
         print("   talk while pointing; Alt+Shift+M marks the element under the mouse.")
         print("   close the browser window (or Ctrl+C) to finish.")
+    if session.mic is not None:
+        time.sleep(3.5)
+        if session.mic.silent_so_far:
+            print("⚠️  the microphone is delivering pure silence — on macOS give Microphone access to the app that\n"
+                  "    started Diamond (Terminal / Claude): System Settings › Privacy & Security › Microphone,\n"
+                  "    then run again. Recording continues without voice.", file=sys.stderr)
     try:
         if args.duration:
             # Automatic pass: the page is visited, inventoried and measured without a human.

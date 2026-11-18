@@ -30,6 +30,9 @@ class TranscriptionUnavailable(RuntimeError):
     pass
 
 
+SILENCE_PEAK = 1e-3  # macOS delivers exact zeros when microphone access is denied
+
+
 def load_wav(wav: Path):
     """16 kHz mono float32 samples in [-1, 1], read without ffmpeg.
 
@@ -178,6 +181,12 @@ def transcribe_session(store: SessionStore, cfg: SpeechConfig) -> list[Word]:
         if not audio["start_epoch_ms"]:
             raise TranscriptionUnavailable("audio start time unknown")
     repair_wav(wav)
+    peak = float(abs(load_wav(wav)).max(initial=0.0))
+    if peak < SILENCE_PEAK:
+        # Whisper hallucinates words on pure silence; never let that become "findings".
+        raise TranscriptionUnavailable(
+            "the microphone recorded only silence — on macOS the app that launched Diamond "
+            "(Terminal or Claude) needs Microphone access: System Settings › Privacy & Security › Microphone")
     transcriber = get_transcriber(cfg.provider)
     t0 = float(audio["start_epoch_ms"])
     words = [Word(text.strip(), t0 + s * 1000, t0 + e * 1000, float(p))

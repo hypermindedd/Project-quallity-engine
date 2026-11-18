@@ -31,6 +31,8 @@ class MicRecorder:
         self._clock_offset = 0.0
         self._lock = threading.Lock()
         self._stopping = threading.Event()
+        self.heard = False   # any non-zero sample so far
+        self._frames = 0
 
     def start(self) -> None:
         try:
@@ -56,9 +58,13 @@ class MicRecorder:
                 raise sd.CallbackStop
             if self._start_ms is None:
                 self._start_ms = (time_info.inputBufferAdcTime + self._clock_offset) * 1000
+            data = bytes(indata)
+            if not self.heard and any(data):
+                self.heard = True
+            self._frames += frames
             with self._lock:
                 if self._wav is not None:
-                    self._wav.writeframes(bytes(indata))
+                    self._wav.writeframes(data)
 
         self._stream = sd.RawInputStream(samplerate=SAMPLE_RATE, channels=1, dtype="int16",
                                          device=self.device, callback=callback)
@@ -66,6 +72,11 @@ class MicRecorder:
         self._clock_offset = time.time() - self._stream.time
         self._stream.start()
         self._write_meta()  # audio.json exists even if the process dies mid-session
+
+    @property
+    def silent_so_far(self) -> bool:
+        """True after 3 s of exact digital silence (typical of a denied macOS permission)."""
+        return not self.heard and self._frames >= SAMPLE_RATE * 3
 
     def _write_meta(self) -> None:
         self.store.write_json("audio.json", {"start_epoch_ms": self._start_ms or time.time() * 1000,

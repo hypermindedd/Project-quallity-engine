@@ -258,3 +258,21 @@ def test_load_wav_without_ffmpeg(tmp_path):
         w.writeframes((np.array([0, 16384, -32768], dtype=np.int16)).tobytes())
     samples = load_wav(wav)
     assert samples.dtype == np.float32 and list(samples) == [0.0, 0.5, -1.0]
+
+
+def test_silent_recording_is_reported_not_transcribed(tmp_path):
+    import json as _json
+    import wave
+
+    from diamond.config import SpeechConfig
+    from diamond.session import SessionStore
+    from diamond.speech.base import TranscriptionUnavailable, transcribe_session
+    store = SessionStore.create(tmp_path, {"url": "u"})
+    with wave.open(str(store.root / "audio.wav"), "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(16000)
+        w.writeframes(b"\x00\x00" * 16000)
+    (store.root / "audio.json").write_text(_json.dumps({"start_epoch_ms": 1.0}))
+    with pytest.raises(TranscriptionUnavailable, match="silence"):
+        transcribe_session(store, SpeechConfig(provider="openai"))
