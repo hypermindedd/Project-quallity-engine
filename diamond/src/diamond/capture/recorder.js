@@ -68,10 +68,14 @@
     return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
   }
 
+  // Solid colour behind the element, or 'image' when a gradient/image is painted
+  // first (contrast then cannot be computed from colours alone).
   function effectiveBackground(el) {
     for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
-      const c = parseColor(getComputedStyle(n).backgroundColor);
+      const cs = getComputedStyle(n);
+      const c = parseColor(cs.backgroundColor);
       if (c && c.a > 0.5) return `rgb(${c.r}, ${c.g}, ${c.b})`;
+      if (cs.backgroundImage && cs.backgroundImage !== 'none') return 'image';
     }
     return 'rgb(255, 255, 255)';
   }

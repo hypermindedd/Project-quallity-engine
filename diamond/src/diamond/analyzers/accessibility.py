@@ -32,9 +32,12 @@ class AccessibilityAnalyzer:
             low: dict[tuple, list] = defaultdict(list)
             small: list[dict] = []
             unnamed: list[dict] = []
+            on_image: list[dict] = []
             for el in inv.get("elements", []):
                 st = el.get("styles") or {}
-                if el.get("text"):
+                if el.get("text") and st.get("effectiveBackground") == "image":
+                    on_image.append(el)  # gradient/image background: colours alone cannot decide
+                elif el.get("text"):
                     fg, bg = parse_rgb(st.get("color")), parse_rgb(st.get("effectiveBackground"))
                     if fg and bg:
                         fg_rgb = blend(fg[0], fg[1] * float(st.get("opacity") or 1), bg[0])
@@ -60,6 +63,15 @@ class AccessibilityAnalyzer:
                     evidence={"key": f"{fg}/{bg}", "ratio": round(ratio, 2), "elements": len(items),
                               "threshold": need, "threshold_origin": th.contrast_normal.origin},
                     suggestion="رنگ متن را تیره‌تر (یا زمینه را روشن‌تر) کنید تا به حداقل نسبت برسد.",
+                ))
+            if on_image:
+                result.findings.append(Finding(
+                    check_id="a11y.contrast_unverified", category=Category.ACCESSIBILITY, severity=Severity.INFO,
+                    title=f"{len(on_image)} متن روی گرادیان/تصویر؛ کنتراست با رنگ قابل محاسبه نیست",
+                    detail="، ".join((e.get("text") or "")[:20] for e in on_image[:6]),
+                    page_url=url, target=on_image[0],
+                    evidence={"key": "contrast_on_image", "elements": [e["selector"] for e in on_image[:20]]},
+                    suggestion="با چشم یا با نقد بصری (visual_critic) بررسی شود.",
                 ))
             if small:
                 result.findings.append(Finding(

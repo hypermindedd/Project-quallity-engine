@@ -168,3 +168,22 @@ def test_repair_wav_written_by_a_killed_process(tmp_path):
     with wave.open(str(wav), "rb") as r:
         assert r.getnframes() == 16000
     assert not repair_wav(wav)
+
+
+def test_contrast_on_gradient_is_not_a_false_failure():
+    from diamond.analyzers.accessibility import AccessibilityAnalyzer
+    from diamond.analyzers.base import AnalysisContext
+    from diamond.config import DiamondConfig
+
+    el = {"selector": "#send", "tag": "button", "text": "ارسال", "name": "ارسال", "interactive": True,
+          "rect": {"x": 0, "y": 0, "w": 80, "h": 40},
+          "styles": {"color": "rgb(0, 22, 23)", "effectiveBackground": "image", "fontSize": "11px"}}
+    inv = {"type": "inventory", "url": "u", "ts": 1, "elements": [el], "images": []}
+
+    class Store:  # minimal stand-in
+        def shot_near(self, ts):
+            return ""
+
+    res = AccessibilityAnalyzer().run(AnalysisContext(Store(), DiamondConfig(), [inv]))
+    ids = [f.check_id for f in res.findings]
+    assert "a11y.contrast" not in ids and "a11y.contrast_unverified" in ids
