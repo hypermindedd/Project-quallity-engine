@@ -62,3 +62,22 @@ def test_ui_runner_finds_click_errors_overflow_broken_images_and_direction(ctx_f
     shots = {p.relative_to(ctx.out_dir / "ui").as_posix() for p in (ctx.out_dir / "ui").rglob("*.png")}
     assert {"mobile/index.html.png", "mobile/page2.html.png", "desktop/page2.html.png"} <= shots
     assert len(shots) == 2 * interaction.metrics["pages"]  # every crawled page at every viewport
+
+
+def test_crawler_closes_modals_and_skips_disabled_controls(ctx_factory):
+    contract = f"""
+        [project]
+        name = "modal"
+        [ui]
+        enabled = true
+        start_command = ["{sys.executable}", "-m", "http.server", "{{port}}", "--bind", "127.0.0.1", "--directory", "{FIXTURES / 'modal'}"]
+        ready_path = "/index.html"
+        pages = ["/index.html"]
+        viewports = [{{ name = "desktop", width = 1280, height = 800 }}]
+    """
+    ctx = ctx_factory(contract)
+    results = {r.check_id: r for r in UiRunner().run(ctx)}
+    if "ui" in results and results["ui"].status == Status.SKIPPED:
+        pytest.skip(results["ui"].summary)
+    titles = [f.title for f in results["ui.interaction"].findings]
+    assert not any("could not be clicked" in t for t in titles), titles

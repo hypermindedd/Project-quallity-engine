@@ -431,6 +431,19 @@ class UiRunner(Runner):
             result.findings.append(Finding("ui.interaction", Dimension.UI_INTERACTION, Severity.SEV2, f"Failed request while {action}",
                                            detail=text, location=Location(url), evidence={"key": f"{url}:{action}:req:{text[:80]}"}))
 
+    @staticmethod
+    def _dismiss_modals(page: Any, PlaywrightError: type[Exception]) -> None:
+        """A click that opened a modal (<dialog>.showModal(), aria-modal) makes the rest of the
+        page inert, so every later click would time out. Close it the way a user would (Escape),
+        then close any native dialog that ignores Escape."""
+        try:
+            if page.evaluate("!!document.querySelector('dialog[open], [aria-modal=\"true\"]:not([hidden])')"):
+                page.keyboard.press("Escape")
+                page.wait_for_timeout(150)
+                page.evaluate("document.querySelectorAll('dialog[open]').forEach(d => d.close())")
+        except PlaywrightError:
+            pass
+
     def _click_everything(self, result: CheckResult, page: Any, c: _Collector, url: str, limit: int, PlaywrightError: type[Exception]) -> None:
         skip = [s.lower() for s in self._skip_words]
         handles = page.query_selector_all(CLICKABLE)
@@ -457,6 +470,7 @@ class UiRunner(Runner):
                 page.wait_for_timeout(400)
                 clicked += 1
                 self._record_errors(result, c, before, url, f"clicking {label}")
+                self._dismiss_modals(page, PlaywrightError)
                 result.tests.append(TestCase(f"ui.click::{slug(url)}::{index}", url, f"click {label}", Status.PASS if c.snapshot() == before else Status.FAIL))
             except PlaywrightError as exc:
                 message = str(exc).splitlines()[0]

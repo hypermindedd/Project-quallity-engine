@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>modal</title></head>
+<body>
+  <h1>Modal fixture</h1>
+  <button id="open">Open library</button>
+  <button id="off" disabled>Disabled until ready</button>
+  <button id="a" onclick="this.textContent='a done'">Action A</button>
+  <button id="b" onclick="this.textContent='b done'">Action B</button>
+  <dialog id="dlg"><p>Library</p><button id="close">Close</button></dialog>
+  <script>
+    document.getElementById('open').onclick = () => document.getElementById('dlg').showModal();
+    document.getElementById('close').onclick = () => document.getElementById('dlg').close();
+  </script>
+</body></html>
