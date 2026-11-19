@@ -442,9 +442,10 @@ class UiRunner(Runner):
             if index >= len(handles):
                 break
             el = handles[index]
+            label = ""
             try:
-                if not el.is_visible():
-                    continue
+                if not el.is_visible() or not el.is_enabled():
+                    continue  # hidden or disabled on purpose: waiting to click it is not a defect
                 label = el.evaluate(DESCRIBE_JS)
                 if any(word in label.lower() for word in skip):
                     continue
@@ -461,8 +462,9 @@ class UiRunner(Runner):
                 message = str(exc).splitlines()[0]
                 if "not attached" in message or "not visible" in message or "intercepts pointer" in message:
                     continue  # element moved or is covered; not a defect by itself
-                result.findings.append(Finding("ui.interaction", Dimension.UI_INTERACTION, Severity.SEV3, "Control could not be clicked",
-                                               detail=message[:300], location=Location(url), evidence={"key": f"{url}:noclick:{index}"}))
+                result.findings.append(Finding("ui.interaction", Dimension.UI_INTERACTION, Severity.SEV3,
+                                               f"Control could not be clicked: {label or f'#{index}'}",
+                                               detail=message[:300], location=Location(url), evidence={"key": f"{url}:noclick:{label or index}"}))
             finally:
                 if page.url.split("#")[0] != url.split("#")[0]:
                     try:
