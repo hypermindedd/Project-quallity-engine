@@ -285,6 +285,11 @@ class PipAuditRunner(Runner):
             else:
                 argv = ["pip-audit", "-r", req, "-f", "json", "--progress-spinner", "off", "--no-deps", "--disable-pip"]
             proc = ctx.run(argv, timeout_s=900)
+            if "--no-deps" in argv and "is not pinned" in proc.tail(40):
+                # Ranges such as "fastapi>=0.120,<1" cannot be audited offline; let pip-audit
+                # resolve them (in its own isolated environment) instead of giving up.
+                argv = [a for a in argv if a not in ("--no-deps", "--disable-pip")]
+                proc = ctx.run(argv, timeout_s=900)
             try:
                 data = json.loads(proc.stdout or "")
             except json.JSONDecodeError:

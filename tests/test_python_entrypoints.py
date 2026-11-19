@@ -56,3 +56,25 @@ def test_pure_api_gets_no_ui_section(tmp_path):
     root = _project(tmp_path, {"main.py": CORE, "requirements.txt": "fastapi\n"})
     _, contract = build_plan(classify(root), discover(root))
     assert "ui" not in contract and contract["api"]["enabled"]
+
+
+def test_pip_audit_resolves_unpinned_requirements(ctx_factory, tmp_path, monkeypatch):
+    """`fastapi>=0.120,<1` cannot be audited with --no-deps; the runner retries with resolution."""
+    import json
+
+    from pqe.context import ProcResult
+    from pqe.runners.security import PipAuditRunner
+
+    (tmp_path / "requirements.txt").write_text("fastapi>=0.120,<1\n")
+    ctx = ctx_factory('[project]\nname = "x"\n[security]\npip_audit = true\npip_audit_requirements = ["requirements.txt"]\n')
+    calls = []
+
+    def fake_run(argv, **kw):
+        calls.append(argv)
+        if "--no-deps" in argv:
+            return ProcResult(argv, 1, "", "ERROR: requirement fastapi is not pinned to an exact version", 0.1)
+        return ProcResult(argv, 0, json.dumps({"dependencies": [{"name": "fastapi", "version": "0.121.0", "vulns": []}]}), "", 0.1)
+
+    monkeypatch.setattr(ctx, "run", fake_run)
+    result = PipAuditRunner().execute(ctx)[0]
+    assert result.status.value == "PASS" and len(calls) == 2 and "--no-deps" not in calls[1]

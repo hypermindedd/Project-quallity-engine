@@ -50,7 +50,7 @@ OVERFLOW_JS = """
       }
     }
   }
-  const broken = [...document.images].filter(i => i.complete && i.naturalWidth === 0).map(i => i.currentSrc || i.src).slice(0, 10);
+  const broken = [...document.images].filter(i => !i.hidden && i.getAttribute('src') && getComputedStyle(i).display !== 'none' && i.complete && i.naturalWidth === 0).map(i => i.currentSrc || i.src).slice(0, 10);
   return {scrollWidth: doc.scrollWidth, viewport: vw, offenders, broken,
           dir: (doc.getAttribute('dir') || getComputedStyle(document.body).direction || '').toLowerCase(),
           lang: doc.getAttribute('lang') || ''};
