@@ -12,6 +12,26 @@ from .consistency import px
 _AXE_IMPACT = {"critical": Severity.SEV1, "serious": Severity.SEV2, "moderate": Severity.SEV3, "minor": Severity.INFO}
 
 
+def background_candidates(value: str | None) -> list:
+    """Solid colours the text may sit on: one for a plain background, one per gradient stop
+    (each blended over the solid colour beneath the gradient)."""
+    if not value:
+        return []
+    if value.startswith("gradient:"):
+        stops, _, base = value[len("gradient:"):].rpartition("@")
+        base_rgb = parse_rgb(base)
+        if not base_rgb:
+            return []
+        out = []
+        for stop in stops.split("|"):
+            parsed = parse_rgb(stop)
+            if parsed:
+                out.append(blend(parsed[0], parsed[1], base_rgb[0]))
+        return out or [base_rgb[0]]
+    parsed = parse_rgb(value)
+    return [parsed[0]] if parsed else []
+
+
 def is_large_text(st: dict) -> bool:
     size = px(st.get("fontSize")) or 16
     weight = int(st.get("fontWeight") or 400) if str(st.get("fontWeight", "400")).isdigit() else 400
@@ -36,12 +56,18 @@ class AccessibilityAnalyzer:
             for el in inv.get("elements", []):
                 st = el.get("styles") or {}
                 if el.get("text") and st.get("effectiveBackground") == "image":
-                    on_image.append(el)  # gradient/image background: colours alone cannot decide
+                    on_image.append(el)  # picture background: colours alone cannot decide
                 elif el.get("text"):
-                    fg, bg = parse_rgb(st.get("color")), parse_rgb(st.get("effectiveBackground"))
-                    if fg and bg:
-                        fg_rgb = blend(fg[0], fg[1] * float(st.get("opacity") or 1), bg[0])
-                        ratio = contrast_ratio(fg_rgb, bg[0])
+                    fg = parse_rgb(st.get("color"))
+                    backgrounds = background_candidates(st.get("effectiveBackground"))
+                    if fg and backgrounds:
+                        # worst case over every colour the text can sit on (each gradient stop)
+                        pairs = []
+                        for bg_rgb in backgrounds:
+                            fg_rgb = blend(fg[0], fg[1] * float(st.get("opacity") or 1), bg_rgb)
+                            pairs.append((contrast_ratio(fg_rgb, bg_rgb), fg_rgb, bg_rgb))
+                        ratio, fg_rgb, worst_bg = min(pairs)
+                        bg = (worst_bg, 1.0)
                         need = (th.contrast_large if is_large_text(st) else th.contrast_normal).value
                         if ratio < need:
                             low[(hex_of(fg_rgb), hex_of(bg[0]), need)].append((el, ratio))
@@ -91,7 +117,7 @@ class AccessibilityAnalyzer:
                     suggestion="aria-label یا متن مخفی برای صفحه‌خوان اضافه کنید.",
                 ))
             for img in inv.get("images", []):
-                if img.get("alt") is None and not img.get("broken"):
+                if img.get("alt") is None and not img.get("broken") and not img.get("pending"):
                     result.findings.append(Finding(
                         check_id="a11y.img_alt", category=Category.ACCESSIBILITY, severity=Severity.SEV3,
                         title="تصویر بدون ویژگی alt", detail=img.get("src", ""), page_url=url,

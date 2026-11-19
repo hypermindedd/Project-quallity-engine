@@ -68,16 +68,28 @@
     return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
   }
 
-  // Solid colour behind the element, or 'image' when a gradient/image is painted
-  // first (contrast then cannot be computed from colours alone).
+  // What is painted behind the element:
+  //   'rgb(r, g, b)'                                 a solid colour
+  //   'gradient:rgba(..)|rgba(..)@rgb(r, g, b)'      CSS gradient stops over the solid colour below
+  //   'image'                                        a picture (contrast cannot be computed)
   function effectiveBackground(el) {
+    let stops = null;
     for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
       const cs = getComputedStyle(n);
       const c = parseColor(cs.backgroundColor);
-      if (c && c.a > 0.5) return `rgb(${c.r}, ${c.g}, ${c.b})`;
-      if (cs.backgroundImage && cs.backgroundImage !== 'none') return 'image';
+      if (c && c.a > 0.5) {
+        const base = `rgb(${c.r}, ${c.g}, ${c.b})`;
+        return stops ? `gradient:${stops.join('|')}@${base}` : base;
+      }
+      const img = cs.backgroundImage;
+      if (img && img !== 'none' && !stops) {
+        if (/url\(/.test(img) || !/gradient\(/.test(img)) return 'image';
+        stops = img.match(/rgba?\([^)]*\)/g) || [];
+        if (!stops.length) return 'image';
+      }
     }
-    return 'rgb(255, 255, 255)';
+    const white = 'rgb(255, 255, 255)';
+    return stops ? `gradient:${stops.join('|')}@${white}` : white;
   }
 
   function sourceHints(el) {
@@ -278,10 +290,14 @@
     for (let n = walker.nextNode(); n && els.length < CFG.maxInventory; n = walker.nextNode()) {
       if (n.textContent.trim().length > 1 && n.parentElement) push(n.parentElement);
     }
-    const images = [...document.images].filter((i) => !isOverlay(i)).slice(0, 100).map((i) => ({
-      selector: selectorOf(i), src: (i.currentSrc || i.src || '').slice(0, 200), alt: i.getAttribute('alt'),
-      broken: i.complete && i.naturalWidth === 0,
-    }));
+    const images = [...document.images].filter((i) => !isOverlay(i)).slice(0, 100).map((i) => {
+      // A hidden <img> without a source is a placeholder waiting for content, not a broken image.
+      const pending = i.hidden || !i.getAttribute('src') || getComputedStyle(i).display === 'none';
+      return {
+        selector: selectorOf(i), src: (i.currentSrc || i.src || '').slice(0, 200), alt: i.getAttribute('alt'),
+        pending, broken: !pending && i.complete && i.naturalWidth === 0,
+      };
+    });
     const animations = [];
     for (const el of document.querySelectorAll('body *')) {
       if (animations.length >= 200) break;

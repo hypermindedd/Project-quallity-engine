@@ -297,3 +297,27 @@ def test_hallucination_filter():
     from diamond.speech.base import plausible_word
     assert plausible_word("دکمه", 0.9) and plausible_word("Previous", 0.8)
     assert not plausible_word("тер", 0.9) and not plausible_word("よう", 0.9) and not plausible_word("رسول", 0.01)
+
+
+def test_contrast_measured_on_gradient_stops():
+    from diamond.analyzers.accessibility import AccessibilityAnalyzer, background_candidates
+    from diamond.analyzers.base import AnalysisContext
+    from diamond.config import DiamondConfig
+
+    bg = "gradient:rgba(13, 35, 51, 0.88)|rgba(7, 22, 34, 0.91)@rgb(6, 20, 33)"
+    assert len(background_candidates(bg)) == 2
+
+    def run(color):
+        el = {"selector": "#t", "tag": "p", "text": "متن", "interactive": False,
+              "rect": {"x": 0, "y": 0, "w": 80, "h": 20},
+              "styles": {"color": color, "effectiveBackground": bg, "fontSize": "12px"}}
+
+        class Store:
+            def shot_near(self, ts):
+                return ""
+
+        inv = {"type": "inventory", "url": "u", "ts": 1, "elements": [el], "images": []}
+        return [f.check_id for f in AccessibilityAnalyzer().run(AnalysisContext(Store(), DiamondConfig(), [inv])).findings]
+
+    assert "a11y.contrast" in run("rgb(70, 85, 95)")       # dim grey on dark navy: fails
+    assert "a11y.contrast" not in run("rgb(220, 230, 235)")  # light text: passes
