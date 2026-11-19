@@ -311,6 +311,31 @@ def _app_variable(text: str) -> tuple[str, str] | None:
     return None
 
 
+_LAUNCHER = re.compile(r"(^|/)(Procfile|Makefile|Dockerfile[^/]*|docker-compose[^/]*\.ya?ml|compose\.ya?ml|[^/]+\.(command|sh)|README[^/]*\.md)$")
+_ASGI_REF = re.compile(r"(?:uvicorn|gunicorn|hypercorn)\b[^\n]*?\b([\w.]+):(\w+)|flask\s+--app\s+([\w.]+)(?::(\w+))?|FLASK_APP=([\w.]+)")
+_SERVES_UI = re.compile(r"StaticFiles\([^)]*html\s*=\s*True|FileResponse\([^)]*index\.html|Jinja2Templates|render_template\(|HTMLResponse")
+
+
+def _launcher_references(inv: Inventory) -> dict[str, list[str]]:
+    """'module:var' (and bare 'module') → files that start it (scripts, Procfile, Docker, README)."""
+    refs: dict[str, list[str]] = {}
+    for rel in inv.files:
+        if not _LAUNCHER.search(rel) or "/node_modules/" in rel:
+            continue
+        text = inv.read(rel, limit=200_000) or ""
+        for match in _ASGI_REF.finditer(text):
+            module = match.group(1) or match.group(3) or match.group(5)
+            var = match.group(2) or match.group(4)
+            for key in ({f"{module}:{var}", module} if var else {module}):
+                refs.setdefault(key, []).append(rel)
+    return refs
+
+
+def _serves_ui(text: str) -> bool:
+    """A Python web app that renders pages (static index, templates) is also a website to test."""
+    return bool(_SERVES_UI.search(text))
+
+
 def detect_python(inv: Inventory, out: list[Component]) -> None:
     py_files = [f for f in inv.suffix(".py") if not re.search(r"(^|/)(tests?|test_[^/]+|conftest)\b", f) and "/migrations/" not in f]
     if not py_files:
@@ -327,6 +352,7 @@ def detect_python(inv: Inventory, out: list[Component]) -> None:
                                  start_command=["python", "manage.py", "runserver", "127.0.0.1:{port}", "--noreload"]))
             found_service = True
             break
+    launchers = _launcher_references(inv)
     candidates: list[tuple[int, Component]] = []
     for rel in py_files:
         text = inv.read(rel, limit=300_000)
@@ -348,8 +374,17 @@ def detect_python(inv: Inventory, out: list[Component]) -> None:
                          framework=framework, install_command=_python_install(inv, project), test_commands=tests,
                          start_command=start, health_path=health, ready_path=health or (openapi or "/"),
                          openapi_path=openapi, app_id=f"{module}:{var}", extra={"python_root": root})
-        # Prefer the richest entrypoint with a health route; legacy/demo/example folders lose.
-        score = routes * 2 + (5 if health else 0) - (40 if re.search(r"(^|/)(legacy|demo|examples?|server|deployment)/", rel) else 0)
+        # Prefer the entrypoint the project itself starts, then the richest one with a health
+        # route; legacy/demo/example folders lose. ("server/" is a normal home for the real
+        # app, so it is no longer penalised.)
+        score = routes * 2 + (5 if health else 0) - (40 if re.search(r"(^|/)(legacy|demos?|examples?|deployment)/", rel) else 0)
+        starters = launchers.get(f"{module}:{var}") or launchers.get(module, [])
+        if starters:
+            score += 60
+            comp.evidence.append(f"started by {starters[0]}")
+        if _serves_ui(text):
+            comp.extra["serves_ui"] = "true"
+            comp.evidence.append("serves an HTML user interface")
         candidates.append((score, comp))
     if candidates and not found_service:
         candidates.sort(key=lambda item: -item[0])

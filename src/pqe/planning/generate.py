@@ -219,6 +219,9 @@ class _Builder:
                    ["performance.latency", "load.http"], "web", comp, "recorded as UNCALIBRATED until a human approves a baseline")
         self.goal("U-API-1", "The API never fails with 5xx or leaks internals on hostile input", ["api.robustness"])
         self.goal("U-API-2", "Every declared API endpoint answers as specified", ["api.contract"])
+        if comp.extra.get("serves_ui") and "ui" not in self.contract:
+            # The service also renders the product's pages: test them like any website.
+            self.web_ui(comp, comp.start_command, comp.path, [], env)
 
     def web_ui(self, comp: Component, start: list[str], cwd: str, requires: list[str], env: dict[str, str]) -> None:
         ui: dict[str, Any] = {"enabled": True, "start_command": start, "cwd": cwd, "pages": ["/"], "ready_timeout_s": 240,
