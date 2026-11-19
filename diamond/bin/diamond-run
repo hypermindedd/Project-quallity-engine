@@ -54,6 +54,8 @@ die()  { local code="$1"; shift; printf '❌ %s\n' "$*" >&2; exit "$code"; }
 
 usage() { sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'; }
 
+ORIG_ARGS=("$@")
+
 # ------------------------------------------------------------------ arguments
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -419,6 +421,30 @@ if [ "$DOCTOR" -eq 1 ]; then
 fi
 
 install_engine "$KIND" "$SRC" "$STAMP"
+
+# macOS grants the microphone to the *app* that starts a process. When an AI
+# assistant runs this launcher (no terminal attached), its processes get pure
+# silence. So a narrated review re-launches itself inside Terminal.app, which
+# asks the user for Microphone access once, and this process waits for it.
+if [ "$(uname -s)" = "Darwin" ] && [ -z "$SMOKE" ] && [ "$ANALYZE_LAST" -eq 0 ] && [ ! -t 0 ] \
+   && [ -z "${DIAMOND_IN_TERMINAL:-}" ] && [ -z "${DIAMOND_NO_TERMINAL:-}" ] && command -v osascript >/dev/null 2>&1; then
+  mkdir -p "$PROJECT/.diamond"
+  DONE="$PROJECT/.diamond/terminal-run.status"
+  rm -f "$DONE"
+  CMD="cd $(printf '%q' "$PROJECT") && DIAMOND_IN_TERMINAL=1 bash $(printf '%q' "$0")"
+  for a in ${ORIG_ARGS[@]+"${ORIG_ARGS[@]}"}; do CMD="$CMD $(printf '%q' "$a")"; done
+  CMD="$CMD; echo \$? > $(printf '%q' "$DONE")"
+  ESCAPED="$(printf '%s' "$CMD" | sed 's/\\/\\\\/g; s/"/\\"/g')"
+  osascript -e "tell application \"Terminal\" to activate" -e "tell application \"Terminal\" to do script \"$ESCAPED\"" >/dev/null \
+    || die 3 "could not open Terminal (allow the assistant to control Terminal when macOS asks)"
+  say "opened the review in Terminal (microphone access belongs to Terminal); waiting for it to finish …"
+  trap - EXIT INT TERM
+  while [ ! -f "$DONE" ]; do sleep 2; done
+  CODE="$(cat "$DONE")"; rm -f "$DONE"
+  REPORT="$(ls -1d "$PROJECT"/.diamond/sessions/*/ 2>/dev/null | sort | tail -n 1)report.md"
+  [ -f "$REPORT" ] && say "report: $REPORT"
+  exit "${CODE:-1}"
+fi
 DIAMOND="$ENGINE_HOME/venv/bin/diamond"
 if [ -z "${DIAMOND_BROWSER_CHANNEL:-}" ] && [ -n "$(installed_chrome)" ]; then
   export DIAMOND_BROWSER_CHANNEL=chrome
