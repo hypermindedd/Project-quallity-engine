@@ -30,6 +30,12 @@ def is_button(el: dict) -> bool:
     return el.get("tag") == "a" and bg is not None and bg[1] > 0.5 and (px(st.get("paddingLeft")) or 0) >= 8
 
 
+def is_icon_button(el: dict) -> bool:
+    """Round/square icon buttons (mic, close…) are a separate, legitimate shape."""
+    r = el.get("rect", {})
+    return not el.get("text") and abs(r.get("w", 0) - r.get("h", 0)) <= 4
+
+
 def near_duplicate_clusters(colors: Counter, threshold: float) -> list[list[tuple]]:
     """Union-find over colours whose ΔE is > 0 and < threshold."""
     items = list(colors)
@@ -82,10 +88,12 @@ class ConsistencyAnalyzer:
                     font_sizes[size] += 1
                 if has_text and st.get("fontFamily"):
                     families[st["fontFamily"].split(",")[0].strip().strip("\"'").lower()] += 1
-                if is_button(el):
-                    sig = (el["rect"]["h"], st.get("borderRadius"), st.get("fontSize"), st.get("fontWeight"),
-                           st.get("paddingLeft"), st.get("backgroundColor"))
-                    variants[sig].append((url, el["selector"]))
+                if is_button(el) and not is_icon_button(el):
+                    # Size/shape only: colour variants (primary, ghost, danger…) are intentional design,
+                    # inconsistent height, radius, type size and padding are drift.
+                    sig = (round(el["rect"]["h"] / 4) * 4, st.get("borderRadius"), st.get("fontSize"),
+                           st.get("fontWeight"), st.get("paddingLeft"))
+                    variants[sig].append((url, el["selector"], st.get("backgroundColor")))
                 for prop in ("paddingTop", "paddingRight", "paddingBottom", "paddingLeft",
                              "marginTop", "marginRight", "marginBottom", "marginLeft"):
                     v = px(st.get(prop))
@@ -123,11 +131,11 @@ class ConsistencyAnalyzer:
             listed = sorted(variants.items(), key=lambda kv: -len(kv[1]))
             result.findings.append(Finding(
                 check_id="consistency.button_variants", category=Category.CONSISTENCY, severity=Severity.SEV3,
-                title=f"{len(variants)} سبک دکمه‌ی متفاوت",
-                detail="ارتفاع/گردی/اندازه‌ی فونت/وزن/پدینگ/رنگ دکمه‌ها یکدست نیست.",
+                title=f"{len(variants)} اندازه/شکل متفاوت برای دکمه‌ها",
+                detail="ارتفاع، گردی گوشه، اندازه و وزن فونت یا پدینگ دکمه‌ها یکدست نیست (رنگ‌ها جدا حساب نمی‌شوند).",
                 target={"selector": listed[-1][1][0][1]},
                 evidence={"key": "buttons", **th.max_button_variants.as_evidence(), "variants": [
-                    {"height": s[0], "radius": s[1], "font_size": s[2], "weight": s[3], "padding_x": s[4], "background": s[5],
+                    {"height": s[0], "radius": s[1], "font_size": s[2], "weight": s[3], "padding_x": s[4],
                      "count": len(v), "example": v[0][1], "page": v[0][0]} for s, v in listed]},
                 suggestion="یک کامپوننت دکمه با چند واریانت تعریف‌شده (primary/secondary/ghost × اندازه) بسازید.",
             ))

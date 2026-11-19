@@ -160,6 +160,7 @@
       classes: typeof el.className === 'string' ? el.className.trim().split(/\s+/).filter(Boolean).slice(0, 8) : [],
       rect: { x: Math.round(r.left), y: Math.round(r.top + scrollY), w: Math.round(r.width), h: Math.round(r.height) },
       interactive: el.matches(INTERACTIVE),
+      disabled: !!(el.disabled || el.getAttribute('aria-disabled') === 'true' || el.closest('fieldset[disabled]')),
       source: sourceHints(el),
     };
     if (withStyles) {

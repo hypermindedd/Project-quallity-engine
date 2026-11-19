@@ -57,7 +57,7 @@ class AccessibilityAnalyzer:
                 st = el.get("styles") or {}
                 if el.get("text") and st.get("effectiveBackground") == "image":
                     on_image.append(el)  # picture background: colours alone cannot decide
-                elif el.get("text"):
+                elif el.get("text") and not el.get("disabled"):  # WCAG 1.4.3 exempts inactive controls
                     fg = parse_rgb(st.get("color"))
                     backgrounds = background_candidates(st.get("effectiveBackground"))
                     if fg and backgrounds:

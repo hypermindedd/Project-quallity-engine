@@ -321,3 +321,21 @@ def test_contrast_measured_on_gradient_stops():
 
     assert "a11y.contrast" in run("rgb(70, 85, 95)")       # dim grey on dark navy: fails
     assert "a11y.contrast" not in run("rgb(220, 230, 235)")  # light text: passes
+
+
+def test_disabled_controls_are_exempt_from_contrast():
+    from diamond.analyzers.accessibility import AccessibilityAnalyzer
+    from diamond.analyzers.base import AnalysisContext
+    from diamond.config import DiamondConfig
+
+    el = {"selector": "#go", "tag": "button", "text": "Go", "name": "Go", "interactive": True, "disabled": True,
+          "rect": {"x": 0, "y": 0, "w": 80, "h": 40},
+          "styles": {"color": "rgb(90, 90, 90)", "effectiveBackground": "rgb(80, 80, 80)", "fontSize": "12px", "opacity": "0.4"}}
+
+    class Store:
+        def shot_near(self, ts):
+            return ""
+
+    inv = {"type": "inventory", "url": "u", "ts": 1, "elements": [el], "images": []}
+    ids = [f.check_id for f in AccessibilityAnalyzer().run(AnalysisContext(Store(), DiamondConfig(), [inv])).findings]
+    assert "a11y.contrast" not in ids
