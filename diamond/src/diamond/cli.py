@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import sys
 import time
 from pathlib import Path
@@ -45,9 +46,19 @@ def _cmd_review(args: argparse.Namespace) -> int:
         root = session.stop()
     if args.no_analyze:
         print(root)
+        if session.audio_status == "recording":
+            sys.stdout.flush()
+            os._exit(0)
         return 0
     outcome = analyze(root, cfg, repo)
     print(json.dumps(outcome.summary(), ensure_ascii=False, indent=2))
+    if session.audio_status == "recording":
+        # Everything is on disk. PortAudio's exit handler (Pa_Terminate) can hang on
+        # macOS after a stream was aborted, which would keep the launcher and the dev
+        # server waiting forever, so leave without running exit handlers.
+        sys.stdout.flush()
+        sys.stderr.flush()
+        os._exit(0)
     return 0
 
 
