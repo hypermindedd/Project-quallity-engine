@@ -17,6 +17,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
+import re
 import urllib.request
 import uuid
 from pathlib import Path
@@ -31,6 +32,15 @@ class TranscriptionUnavailable(RuntimeError):
 
 
 SILENCE_PEAK = 1e-3  # macOS delivers exact zeros when microphone access is denied
+
+
+_FOREIGN_SCRIPT = re.compile(r"[\u0400-\u04FF\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF\u0590-\u05FF]")
+
+
+def plausible_word(text: str, probability: float) -> bool:
+    """Drop Whisper hallucinations: words in scripts a Persian/English reviewer does not
+    speak (Cyrillic, CJK, Hebrew…) and near-zero-probability words (typical over noise)."""
+    return not _FOREIGN_SCRIPT.search(text) and probability >= 0.05
 
 
 def load_wav(wav: Path):
@@ -189,8 +199,8 @@ def transcribe_session(store: SessionStore, cfg: SpeechConfig) -> list[Word]:
             "(Terminal or Claude) needs Microphone access: System Settings › Privacy & Security › Microphone")
     transcriber = get_transcriber(cfg.provider)
     t0 = float(audio["start_epoch_ms"])
-    words = [Word(text.strip(), t0 + s * 1000, t0 + e * 1000, float(p))
-             for text, s, e, p in transcriber.transcribe(wav, cfg) if text.strip()]
+    raw = [(text.strip(), s, e, float(p)) for text, s, e, p in transcriber.transcribe(wav, cfg) if text.strip()]
+    words = [Word(text, t0 + s * 1000, t0 + e * 1000, p) for text, s, e, p in raw if plausible_word(text, p)]
     store.write_json("transcript.json", {"provider": transcriber.name, "model": cfg.model,
                                          "words": [w.__dict__ for w in words]})
     return words

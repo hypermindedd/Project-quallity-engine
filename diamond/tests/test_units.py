@@ -276,3 +276,24 @@ def test_silent_recording_is_reported_not_transcribed(tmp_path):
     (store.root / "audio.json").write_text(_json.dumps({"start_epoch_ms": 1.0}))
     with pytest.raises(TranscriptionUnavailable, match="silence"):
         transcribe_session(store, SpeechConfig(provider="openai"))
+
+
+def test_comma_chained_remarks_become_separate_notes():
+    words = []
+    t = 0
+    for w in "اینجا باید بیشتر توضیح داده بشه، این قسمت‌ها همه‌ش تو هم قاطی شده، این فونت خیلی گنده است".split():
+        words.append(Word(w, t, t + 150))
+        t += 160
+    events = [{"type": "hover", "ts": 0, "url": "u", "el": {"selector": "#a"}},
+              {"type": "hover", "ts": 900, "url": "u", "el": {"selector": "#b"}},
+              {"type": "hover", "ts": 1880, "url": "u", "el": {"selector": "#c"}}]
+    notes = align(words, events, FusionConfig())
+    cats = [n.category for n in notes]
+    assert cats == [Category.CONTENT, Category.LAYOUT, Category.VISUAL], cats
+    assert [n.target["selector"] for n in notes] == ["#a", "#b", "#c"]
+
+
+def test_hallucination_filter():
+    from diamond.speech.base import plausible_word
+    assert plausible_word("دکمه", 0.9) and plausible_word("Previous", 0.8)
+    assert not plausible_word("тер", 0.9) and not plausible_word("よう", 0.9) and not plausible_word("رسول", 0.01)

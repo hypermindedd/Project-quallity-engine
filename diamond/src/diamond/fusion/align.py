@@ -26,7 +26,7 @@ from ..session import Word
 from ..speech.lexicon import classify, is_deictic
 
 POINTER_KINDS = {"click": 300.0, "mark": 300.0, "dwell": 200.0, "hover": 0.0}  # bonus in ms
-SENTENCE_END = ("؟", "?", ".", "!", "؛")
+SENTENCE_END = ("؟", "?", ".", "!", "؛", "،", ",")
 
 
 @dataclass
@@ -69,7 +69,7 @@ class VoiceNote:
     confidence: float = 0.0  # 1.0 = pointer event exactly at the anchor
 
 
-REANCHOR_GAP_MS = 250  # a short breath before a new deictic word starts a new remark
+REANCHOR_GAP_MS = 120  # a short breath before a new deictic word starts a new remark
 REANCHOR_MIN_WORDS = 3
 
 
