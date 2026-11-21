@@ -27,6 +27,15 @@ class LayoutAnalyzer:
                     evidence={"key": "overflow", "offenders": [e["selector"] for e in offenders[:10]]},
                     suggestion="عنصر بیرون‌زده را با max-width: 100%، flex-wrap یا overflow-wrap مهار کنید.",
                 ))
+            height = inv.get("viewport", {}).get("h", 0)
+            for control in inv.get("elements", []):
+                bottom = control.get("viewportBottom")
+                if height and bottom is not None and bottom > height + 1:
+                    result.findings.append(Finding(
+                        check_id="layout.control_below_viewport", category=Category.LAYOUT, severity=Severity.SEV2,
+                        title="کنترل پایین پنجره به‌طور کامل دیده نمی‌شود", page_url=url, target=control,
+                        evidence={"key": control["selector"], "bottom": bottom, "viewportHeight": height},
+                    ))
             for img in inv.get("images", []):
                 if img.get("broken"):
                     result.findings.append(Finding(
