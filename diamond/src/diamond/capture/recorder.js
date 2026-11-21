@@ -289,7 +289,17 @@
       const cs = getComputedStyle(el);
       if (cs.visibility === 'hidden' || cs.display === 'none' || Number(cs.opacity) === 0) return;
       seen.add(el);
-      els.push(describe(el, true));
+      const info = describe(el, true);
+      if (info.interactive && !info.disabled && !el.closest('[inert],[hidden],[aria-hidden="true"]')) {
+        for (let ancestor = el; ancestor; ancestor = ancestor.parentElement) {
+          const style = getComputedStyle(ancestor);
+          if (style.position === 'fixed' || (style.position === 'sticky' && style.bottom !== 'auto')) {
+            info.viewportBottom = r.bottom;
+            break;
+          }
+        }
+      }
+      els.push(info);
     };
     document.querySelectorAll(INTERACTIVE).forEach(push);
     const walker = document.createTreeWalker(document.body || document.documentElement, NodeFilter.SHOW_TEXT);
