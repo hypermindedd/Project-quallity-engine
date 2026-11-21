@@ -9,7 +9,7 @@ from pathlib import Path
 
 from ..config import Config
 from ..context import match_any
-from ..model import CheckResult, Decision, DecisionRecord, Finding, GoalStatus, GoalVerdict, Severity, Status
+from ..model import CheckResult, Decision, DecisionRecord, Dimension, Finding, GoalStatus, GoalVerdict, Severity, Status
 
 BASELINE_FILE = "findings.json"
 
@@ -73,6 +73,11 @@ def decide(results: list[CheckResult], goals: list[GoalVerdict]) -> DecisionReco
         return DecisionRecord(Decision.NO_GO, blocking + conditions)
     if conditions:
         return DecisionRecord(Decision.CONDITIONAL, conditions)
+    runtime = {Dimension.FUNCTIONAL, Dimension.API_CONTRACT, Dimension.API_ROBUSTNESS, Dimension.E2E_FLOW,
+               Dimension.UI_INTERACTION, Dimension.UI_RESPONSIVE, Dimension.UI_VISUAL, Dimension.ACCESSIBILITY, Dimension.MOBILE_STABILITY}
+    if not any(r.dimension in runtime and r.status in {Status.PASS, Status.FAIL}
+               and (not r.tests or any(t.status in {Status.PASS, Status.FAIL} for t in r.tests)) for r in results):
+        return DecisionRecord(Decision.NOT_ASSESSED, ["no functional, API or UI check executed"])
     return DecisionRecord(Decision.GO, ["no blocking findings; all hard-gate goals met"])
 
 

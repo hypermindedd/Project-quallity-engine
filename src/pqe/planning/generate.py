@@ -173,6 +173,8 @@ class _Builder:
     # ------------------------------------------------------------- kinds
     def tests_and_build(self, comp: Component, target: str = "") -> None:
         node_modules = [_join(comp.path, "node_modules")] if comp.framework not in {"python", "fastapi", "flask", "django", "flutter", "gradle", "xcode", "html", "mql5"} else None
+        if comp.framework == "node" and not comp.install_command:
+            node_modules = None
         for argv in comp.test_commands:
             if argv[:3] == ["python", "-m", "pytest"] and comp.path == ".":
                 continue  # handled by the dedicated pytest runner (richer per-test evidence)

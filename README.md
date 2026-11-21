@@ -147,3 +147,9 @@ plugin/                        Claude Code skills and agents
 
 New project kinds are one detector in `classify.py` plus one handler in `generate.py`;
 new checks are one self-registering runner. The core does not change.
+
+### Reproducible quality checks
+
+A build or static scan alone yields `NOT_ASSESSED` when no runtime check ran successfully or failed with evidence. A blocking finding still yields `NO_GO`. For an API contract, set exactly one of `start_command` and `base_url`. The former manages a local fixture, the latter refers to a running test instance.
+
+For a declared PostgreSQL integration command, set `fresh_postgres = true` inside its `[[commands]]` table. Put `initdb` and `pg_ctl` on PATH. Each command receives an isolated cluster through `DATABASE_URL` and standard libpq variables. Database roles and schemas are discarded when that command exits. Set `PQE_AXE_TEST_SOURCE` to a local axe-core bundle to run the strict-CSP regression.

@@ -87,6 +87,7 @@ class Decision(StrEnum):
     GO = "GO"
     CONDITIONAL = "CONDITIONAL"
     NO_GO = "NO_GO"
+    NOT_ASSESSED = "NOT_ASSESSED"
 
 
 @dataclass(frozen=True)

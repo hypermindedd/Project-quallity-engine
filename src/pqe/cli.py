@@ -135,7 +135,7 @@ def cmd_fix(args: argparse.Namespace) -> int:
         print(f"remediation aborted: {exc}", file=sys.stderr)
         return 3
     print(json.dumps(outcome.to_dict(), indent=2))
-    return 0 if outcome.final_decision != "NO_GO" else 1
+    return 0 if outcome.final_decision not in {"NO_GO", "NOT_ASSESSED"} else 1
 
 
 def cmd_baseline(args: argparse.Namespace) -> int:

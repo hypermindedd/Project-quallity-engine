@@ -208,7 +208,7 @@ def detect_node(inv: Inventory, out: list[Component]) -> None:
         folder = _parent(manifest)
         deps = {**data.get("dependencies", {}), **data.get("devDependencies", {})}
         scripts = data.get("scripts", {}) or {}
-        tests = [["npm", "run", s] for s in ("typecheck", "lint", "test") if s in scripts]
+        tests = [["npm", "run", s] for s in ("typecheck", "lint", "check", "test") if s in scripts]
         install = _node_install(inv, folder)
         build = ["npm", "run", "build"] if "build" in scripts else []
         ev = [f"{manifest}"]
@@ -241,8 +241,18 @@ def detect_node(inv: Inventory, out: list[Component]) -> None:
             out.append(Component(Kind.CLI_TOOL, folder, ev + ["package.json bin"], framework="node",
                                  install_command=install, test_commands=tests, build_command=build))
             continue
-        if data.get("main") or data.get("exports") or data.get("module"):
-            out.append(Component(Kind.LIBRARY, folder, ev + ["package.json main/exports"], framework="node",
+        if tests and not deps and not data.get("optionalDependencies"):
+            install = []
+        if tests:
+            for entry in re.findall(r"(?:^|\s)([.\w/-]+\.(?:[mc]?js|ts))(?=\s|$)", scripts.get("start", "") + " " + scripts.get("dev", "")):
+                filename = _join(folder, entry.removeprefix("./"))
+                if filename in inv.files:
+                    source = inv.read(filename)
+                    if re.search(r"""['"]node:https?['"]""", source) and "createServer" in source:
+                        ev.append(f"Node HTTP service candidate: {filename}")
+            ev.append("declared verification scripts")
+        if tests or data.get("main") or data.get("exports") or data.get("module"):
+            out.append(Component(Kind.LIBRARY, folder, ev if tests else ev + ["package.json main/exports"], framework="node",
                                  install_command=install, test_commands=tests, build_command=build))
 
 

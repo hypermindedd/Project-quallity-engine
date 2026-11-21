@@ -29,7 +29,7 @@ def _text(content: str) -> list[dict[str, Any]]:
 
 def build_page(report: dict[str, Any], parent_page_id: str) -> dict[str, Any]:
     decision = report["decision"]["decision"]
-    icon = {"GO": "✅", "CONDITIONAL": "⚠️", "NO_GO": "⛔"}[decision]
+    icon = {"GO": "✅", "CONDITIONAL": "⚠️", "NO_GO": "⛔", "NOT_ASSESSED": "⚪"}[decision]
     children: list[dict[str, Any]] = [
         {"object": "block", "type": "callout", "callout": {"rich_text": _text(f"{decision} — " + "; ".join(report["decision"]["reasons"])), "icon": {"emoji": icon}}},
         {"object": "block", "type": "heading_2", "heading_2": {"rich_text": _text("اهداف پروژه")}},
