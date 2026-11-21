@@ -33,6 +33,7 @@ def make_node(tmp_path: Path, deps: dict, scripts: dict, lock: str = "") -> Path
     ({"next": "15"}, "pnpm-lock.yaml", "node:next:dev:pnpm:port 3000"),
     ({"vite": "6", "react": "19"}, "", "node:vite:dev:npm:port 5173"),
     ({"astro": "5"}, "yarn.lock", "node:astro:dev:yarn:port 4321"),
+    ({"vinext": "0.1", "next": "16", "vite": "7"}, "", "node:vinext:dev:npm:port 5173"),
 ])
 def test_detects_node_projects(tmp_path, deps, lock, expected):
     info = doctor(make_node(tmp_path, deps, {"dev": "x"}, lock), tmp_path, DIAMOND_SRC=str(ENGINE))

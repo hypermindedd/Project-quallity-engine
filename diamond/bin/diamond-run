@@ -201,7 +201,7 @@ deps = {**pkg.get("dependencies", {}), **pkg.get("devDependencies", {})}
 scripts = pkg.get("scripts", {})
 expr = sys.argv[2]
 if expr == "framework":
-    for name, fw in (("next", "next"), ("nuxt", "nuxt"), ("astro", "astro"), ("@sveltejs/kit", "sveltekit"),
+    for name, fw in (("vinext", "vinext"), ("next", "next"), ("nuxt", "nuxt"), ("astro", "astro"), ("@sveltejs/kit", "sveltekit"),
                      ("@remix-run/dev", "remix"), ("gatsby", "gatsby"), ("@angular/core", "angular"),
                      ("react-scripts", "cra"), ("vite", "vite")):
         if name in deps:
@@ -306,7 +306,7 @@ start_python_server() {
 default_port() {
   case "$1" in
     next|nuxt|cra|remix) echo 3000 ;;
-    vite|sveltekit) echo 5173 ;;
+    vite|sveltekit|vinext) echo 5173 ;;
     astro) echo 4321 ;;
     angular) echo 4200 ;;
     gatsby) echo 8000 ;;
@@ -315,10 +315,14 @@ default_port() {
 }
 
 package_manager() {
-  if [ -f "$PROJECT/pnpm-lock.yaml" ]; then echo pnpm
-  elif [ -f "$PROJECT/yarn.lock" ]; then echo yarn
-  elif [ -f "$PROJECT/bun.lockb" ] || [ -f "$PROJECT/bun.lock" ]; then echo bun
-  else echo npm; fi
+  local pm=npm
+  if [ -f "$PROJECT/pnpm-lock.yaml" ]; then pm=pnpm
+  elif [ -f "$PROJECT/yarn.lock" ]; then pm=yarn
+  elif [ -f "$PROJECT/bun.lockb" ] || [ -f "$PROJECT/bun.lock" ]; then pm=bun; fi
+  # `<pm> run <script>` works the same with npm when the lockfile's tool is not installed
+  # and node_modules already exists (installs still need the right tool).
+  if ! command -v "$pm" >/dev/null 2>&1 && [ -d "$PROJECT/node_modules" ]; then pm=npm; fi
+  echo "$pm"
 }
 
 url_up() { curl -s -o /dev/null -m 3 "$1"; }
