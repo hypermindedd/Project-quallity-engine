@@ -491,7 +491,9 @@ class UiRunner(Runner):
 
     @staticmethod
     def _axe(result: CheckResult, page: Any, url: str, viewport: str, source: str) -> None:
-        page.add_script_tag(content=source)
+        # DevTools evaluates the local auditor without inserting an inline script
+        # element. The page and the interaction suite keep their real CSP.
+        page.evaluate(source + "\n;void 0;")
         report = page.evaluate("async () => await axe.run(document, {resultTypes: ['violations']})")
         for violation in report.get("violations", []):
             severity = _AXE_IMPACT.get(violation.get("impact") or "minor", Severity.INFO)

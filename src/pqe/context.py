@@ -39,6 +39,7 @@ ALWAYS_EXCLUDED_DIRS = {
     ".turbo",
     ".cache",
     ".pqe-engine",
+    ".sites-runtime",
     "pqe-report",
 }
 

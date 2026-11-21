@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import xml.etree.ElementTree as ET  # noqa: S405 - parses files produced by our own pytest run
+from contextlib import nullcontext
 from pathlib import Path
 
 from ..context import RunContext, ToolMissing
 from ..model import CheckResult, Dimension, Finding, Location, Severity, Status, TestCase
+from ..postgres import fresh_postgres
 from .base import Runner, register
 
 
@@ -147,7 +149,12 @@ class CommandsRunner(Runner):
                 )
                 continue
             try:
-                proc = ctx.run(spec.argv, cwd=spec.cwd, env=ctx.build_env(spec.env), timeout_s=spec.timeout_s)
+                with fresh_postgres() if spec.fresh_postgres else nullcontext({}) as database_env:
+                    proc = ctx.run(spec.argv, cwd=spec.cwd, env={**ctx.build_env(spec.env), **database_env}, timeout_s=spec.timeout_s)
+                    if database_env:
+                        password = database_env["PGPASSWORD"]
+                        proc.stdout = proc.stdout.replace(password, "***")
+                        proc.stderr = proc.stderr.replace(password, "***")
             except (ToolMissing, OSError) as exc:  # one broken command must not stop the others
                 status = Status.SKIPPED if isinstance(exc, ToolMissing) else Status.ERROR
                 results.append(CheckResult(check_id, spec.title, spec.dimension, status, summary=f"cannot execute: {exc}"))

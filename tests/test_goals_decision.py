@@ -60,7 +60,8 @@ def test_decision_policy():
     assert decide(sev1, []).decision == Decision.CONDITIONAL
     unverified_gate = evaluate_goal(Goal("H", "h", [], hard_gate=True), [], {})
     assert decide([], [unverified_gate]).decision == Decision.CONDITIONAL
-    assert decide([CheckResult("ok", "ok", Dimension.BUILD, Status.PASS)], []).decision == Decision.GO
+    assert decide([CheckResult("ok", "ok", Dimension.BUILD, Status.PASS)], []).decision == Decision.NOT_ASSESSED
+    assert decide([CheckResult("run", "run", Dimension.FUNCTIONAL, Status.PASS)], []).decision == Decision.GO
 
 
 def test_traceability_reports_unmapped_requirements(tmp_path):

@@ -51,6 +51,7 @@ class CommandSpec:
     severity: Severity = Severity.SEV1
     requires: list[str] = field(default_factory=list)
     enabled: bool = True
+    fresh_postgres: bool = False
     target: str = ""  # "" = every environment; else web | android | ios | windows
 
 
@@ -467,6 +468,7 @@ def _command(r: _Reader, default_dimension: Dimension) -> CommandSpec:
         dimension=r.enum("dimension", Dimension, default_dimension),
         cwd=r.get("cwd", str, "."),
         env=r.str_map("env"),
+        fresh_postgres=r.get("fresh_postgres", bool, False),
         timeout_s=r.get("timeout_s", int, 900),
         severity=r.enum("severity", Severity, Severity.SEV1),
         requires=r.str_list("requires"),
@@ -583,6 +585,8 @@ def parse_config(data: dict[str, Any], root: Path) -> Config:
     )
     py.done()
 
+    if any(c.fresh_postgres for c in setup):
+        raise ConfigError("fresh_postgres belongs on the command that consumes the isolated database")
     commands = [_command(r, Dimension.BUILD) for r in top.subs("commands")]
 
     a = top.sub("architecture")
@@ -664,6 +668,8 @@ def parse_config(data: dict[str, Any], root: Path) -> Config:
         requires=api_r.str_list("requires"),
     )
     api_r.done()
+    if api.start_command and api.base_url:
+        raise ConfigError("api: choose start_command for a managed server or base_url for an existing server")
     if api.enabled and not (api.start_command or api.base_url):
         raise ConfigError("api: enabled requires start_command or base_url")
 

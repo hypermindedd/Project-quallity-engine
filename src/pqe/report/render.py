@@ -10,7 +10,7 @@ from typing import Any
 
 from ..model import Severity
 
-DECISION_ICON = {"GO": "✅", "CONDITIONAL": "⚠️", "NO_GO": "⛔"}
+DECISION_ICON = {"GO": "✅", "CONDITIONAL": "⚠️", "NO_GO": "⛔", "NOT_ASSESSED": "⚪"}
 GOAL_ICON = {"MET": "✅", "NOT_MET": "❌", "PARTIAL": "🟡", "UNVERIFIED": "⚪"}
 STATUS_ICON = {"PASS": "✅", "FAIL": "❌", "ERROR": "💥", "SKIPPED": "⏭️", "UNCALIBRATED": "📏", "NOT_COVERED": "🕳️"}
 

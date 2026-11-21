@@ -23,6 +23,11 @@ jobs:
         run: python -m pip install -e '.[dev,security,ui]'
       - name: Install Chromium for the browser runner
         run: python -m playwright install --with-deps chromium
+      - name: Prepare accessibility and database regression fixtures
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pqe-a11y" --no-save --ignore-scripts axe-core@4.11.4
+          echo "PQE_AXE_TEST_SOURCE=$RUNNER_TEMP/pqe-a11y/node_modules/axe-core/axe.min.js" >> "$GITHUB_ENV"
+          pg_config --bindir >> "$GITHUB_PATH"
       - name: Lint
         run: ruff check src tests
       - name: Self-tests (includes real browser and HTTP runs)

@@ -24,7 +24,7 @@ from .runners.base import REGISTRY, Runner
 
 log = logging.getLogger("pqe")
 
-EXIT_CODES = {Decision.GO: 0, Decision.CONDITIONAL: 0, Decision.NO_GO: 1}
+EXIT_CODES = {Decision.GO: 0, Decision.CONDITIONAL: 0, Decision.NO_GO: 1, Decision.NOT_ASSESSED: 1}
 
 
 @dataclass
