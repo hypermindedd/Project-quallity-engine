@@ -339,3 +339,40 @@ def test_disabled_controls_are_exempt_from_contrast():
     inv = {"type": "inventory", "url": "u", "ts": 1, "elements": [el], "images": []}
     ids = [f.check_id for f in AccessibilityAnalyzer().run(AnalysisContext(Store(), DiamondConfig(), [inv])).findings]
     assert "a11y.contrast" not in ids
+
+
+# ---------------------------------------------------------------- v0.1.3 fixes
+def test_collapse_repetitions_removes_whisper_loops():
+    from diamond.speech.base import collapse_repetitions
+
+    loop = [("مویمه", 0, 0, 1)] + [(w, 0, 0, 1) for _ in range(40) for w in ("باید", "ایمه")]
+    tail = [(w, 0, 0, 1) for w in "این صفحه خیلی سنگینه".split()]
+    out = [w[0] for w in collapse_repetitions(loop + tail)]
+    assert out == ["مویمه", "باید", "ایمه", "باید", "ایمه", "این", "صفحه", "خیلی", "سنگینه"]
+
+
+def test_collapse_repetitions_keeps_natural_speech():
+    from diamond.speech.base import collapse_repetitions
+
+    words = [(w, 0, 0, 1) for w in "نه نه این دکمه این دکمه کار نمیکنه".split()]
+    assert collapse_repetitions(words) == words
+
+
+def test_engine_busy_frames_are_not_blamed_on_the_app():
+    from diamond.analyzers.performance import overlaps_engine_work
+
+    busy = [(1000.0, 1300.0)]
+    assert overlaps_engine_work({"start": 1100.0, "duration": 200}, busy)
+    assert not overlaps_engine_work({"start": 1400.0, "duration": 200}, busy)
+    assert not overlaps_engine_work({"duration": 200}, busy)
+
+
+def test_window_follows_the_screen(monkeypatch):
+    from diamond.capture.browser import screen_work_area, window_launch_args
+
+    monkeypatch.setenv("DIAMOND_WINDOW", "0,30,1440x810")
+    assert screen_work_area() == (0, 30, 1440, 810)
+    assert window_launch_args((0, 30, 1440, 810)) == ["--window-position=0,30", "--window-size=1440,810"]
+    assert window_launch_args(None) == ["--start-maximized"]
+    monkeypatch.setenv("DIAMOND_WINDOW", "1280x800")
+    assert screen_work_area() == (0, 0, 1280, 800)

@@ -21,7 +21,7 @@ import re
 import urllib.request
 import uuid
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 from ..config import SpeechConfig
 from ..session import SessionStore, Word
@@ -77,6 +77,55 @@ def _prompt(cfg: SpeechConfig) -> str:
     return "بازبینی رابط کاربری وب‌سایت: " + "، ".join(cfg.vocabulary)
 
 
+# Whisper falls into loops ("باید ایمه باید ایمه …") when each window is conditioned on
+# the previous one; these options stop the loop at the decoder (where supported).
+ANTI_LOOP_OPTIONS = {
+    "condition_on_previous_text": False,
+    "compression_ratio_threshold": 2.4,
+    "no_speech_threshold": 0.6,
+    "hallucination_silence_threshold": 2.0,
+}
+
+
+def _supported(fn: Any, options: dict[str, Any]) -> dict[str, Any]:
+    """Only the options this library version accepts (they differ between releases)."""
+    import inspect
+
+    try:
+        params = inspect.signature(fn).parameters
+    except (TypeError, ValueError):
+        return {}
+    return {k: v for k, v in options.items() if k in params}
+
+
+def collapse_repetitions(raw: list[tuple[str, float, float, float]], max_repeats: int = 2,
+                         max_ngram: int = 6) -> list[tuple[str, float, float, float]]:
+    """Remove decoder loops: a phrase of 1–``max_ngram`` words repeated back-to-back more than
+    ``max_repeats`` times is kept only ``max_repeats`` times. Real speech almost never says
+    the same phrase three times in a row; Whisper loops say it dozens of times."""
+    words = list(raw)
+    n = 1
+    while n <= max_ngram:
+        out: list[tuple[str, float, float, float]] = []
+        i = 0
+        changed = False
+        while i < len(words):
+            phrase = [w[0] for w in words[i:i + n]]
+            reps = 1
+            while len(phrase) == n and [w[0] for w in words[i + reps * n:i + (reps + 1) * n]] == phrase:
+                reps += 1
+            if len(phrase) == n and reps > max_repeats:
+                out.extend(words[i:i + max_repeats * n])
+                i += reps * n
+                changed = True
+            else:
+                out.append(words[i])
+                i += 1
+        words = out
+        n = n if changed else n + 1
+    return words
+
+
 class MlxTranscriber:
     name = "mlx"
 
@@ -88,7 +137,8 @@ class MlxTranscriber:
         local = local_model(cfg.model)  # verified copy from `diamond fetch-model`
         repo = str(local) if local else (cfg.model if "/" in cfg.model else f"mlx-community/whisper-{cfg.model}")
         result = mlx_whisper.transcribe(load_wav(wav), path_or_hf_repo=repo, language=cfg.language,
-                                        word_timestamps=True, initial_prompt=_prompt(cfg))
+                                        word_timestamps=True, initial_prompt=_prompt(cfg),
+                                        **_supported(mlx_whisper.transcribe, ANTI_LOOP_OPTIONS))
         return [(w["word"], w["start"], w["end"], w.get("probability", 1.0))
                 for seg in result.get("segments", []) for w in seg.get("words", [])]
 
@@ -101,7 +151,8 @@ class FasterTranscriber:
 
         model = WhisperModel(cfg.model, device="auto", compute_type="int8")
         segments, _ = model.transcribe(load_wav(wav), language=cfg.language, word_timestamps=True,
-                                       initial_prompt=_prompt(cfg), vad_filter=True)
+                                       initial_prompt=_prompt(cfg), vad_filter=True,
+                                       **_supported(model.transcribe, ANTI_LOOP_OPTIONS))
         return [(w.word, w.start, w.end, w.probability) for seg in segments for w in (seg.words or [])]
 
 
@@ -200,6 +251,7 @@ def transcribe_session(store: SessionStore, cfg: SpeechConfig) -> list[Word]:
     transcriber = get_transcriber(cfg.provider)
     t0 = float(audio["start_epoch_ms"])
     raw = [(text.strip(), s, e, float(p)) for text, s, e, p in transcriber.transcribe(wav, cfg) if text.strip()]
+    raw = collapse_repetitions(raw)
     words = [Word(text, t0 + s * 1000, t0 + e * 1000, p) for text, s, e, p in raw if plausible_word(text, p)]
     store.write_json("transcript.json", {"provider": transcriber.name, "model": cfg.model,
                                          "words": [w.__dict__ for w in words]})

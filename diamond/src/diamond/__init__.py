@@ -15,4 +15,4 @@ Layers (each package is designed to be extracted as a standalone skill):
 * ``fix``       — fix briefs + model routing for the fixing agent
 """
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"

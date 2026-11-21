@@ -27,6 +27,18 @@ def cls_session_windows(shifts: list[dict]) -> float:
     return best
 
 
+ENGINE_BUSY_MARGIN_MS = 50
+
+
+def overlaps_engine_work(event: dict, busy: list[tuple[float, float]]) -> bool:
+    """True when a frame/task overlaps a span in which Diamond itself worked on the page."""
+    start = event.get("start")
+    if start is None or not busy:
+        return False
+    end = start + event.get("duration", 0)
+    return any(start < b_end and end > b_start for b_start, b_end in busy)
+
+
 @register
 class PerformanceAnalyzer:
     name = "performance"
@@ -35,7 +47,11 @@ class PerformanceAnalyzer:
         th = ctx.cfg.thresholds
         result = AnalyzerResult(self.name, Status.PASS)
         pages: dict[str, dict[str, list]] = defaultdict(lambda: defaultdict(list))
+        busy = [(b["start"] - ENGINE_BUSY_MARGIN_MS, b["end"] + ENGINE_BUSY_MARGIN_MS)
+                for b in ctx.of_type("engine_busy")]
         for e in ctx.of_type("layout_shift", "event_timing", "loaf", "longtask"):
+            if e["type"] != "layout_shift" and overlaps_engine_work(e, busy):
+                continue  # the engine (e.g. a screenshot) held this frame, not the app
             pages[e["url"].split("#", 1)[0]][e["type"]].append(e)
 
         metrics = {}

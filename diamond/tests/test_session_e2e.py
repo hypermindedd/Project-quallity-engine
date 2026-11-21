@@ -121,3 +121,11 @@ def test_voice_and_measurement_are_cross_linked(outcome):
     dead = next(f for f in outcome.findings if f.check_id == "interaction.dead_click")
     assert dead.fingerprint in voice.evidence["corroborated_by"]
     assert voice.fingerprint in dead.evidence["reported_by_reviewer"] and dead.severity.value == "SEV1"
+
+
+def test_iframes_and_blank_tab_are_not_recorded(outcome):
+    """Init scripts also run in iframes; only the reviewed top page may be recorded."""
+    events = [json.loads(line) for line in (outcome.session / "events.jsonl").read_text().splitlines()]
+    assert not [e for e in events if "tracker.html" in e.get("url", "")]
+    assert not [e for e in events if e.get("url", "").startswith("about:")]
+    assert all(inv["viewport"]["w"] > 1 for inv in events if inv["type"] == "inventory")

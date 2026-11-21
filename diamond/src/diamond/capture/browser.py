@@ -14,7 +14,10 @@ from __future__ import annotations
 
 import json
 import logging
+import os
+import platform
 import queue
+import subprocess
 import threading
 import time
 from pathlib import Path
@@ -38,6 +41,47 @@ class BrowserUnavailable(RuntimeError):
     pass
 
 
+_MAC_VISIBLE_FRAME_JXA = (
+    'ObjC.import("AppKit"); var s=$.NSScreen.mainScreen; var v=s.visibleFrame, f=s.frame;'
+    '[v.origin.x, f.size.height - v.origin.y - v.size.height, v.size.width, v.size.height].join(",")'
+)
+
+
+def screen_work_area() -> tuple[int, int, int, int] | None:
+    """(x, y, width, height) of the usable screen area — menu bar and Dock excluded.
+
+    A reviewer's window must fit on the screen. When the page is told it is taller
+    than the window (a fixed emulated viewport), its bottom part is drawn outside
+    the window and can never be scrolled into view.
+    """
+    override = os.environ.get("DIAMOND_WINDOW", "")  # "WIDTHxHEIGHT" or "X,Y,WIDTHxHEIGHT"
+    if override:
+        try:
+            *pos, size = override.split(",")
+            w, h = (int(v) for v in size.lower().split("x"))
+            x, y = (int(v) for v in pos) if len(pos) == 2 else (0, 0)
+            return x, y, w, h
+        except ValueError:
+            log.warning("ignoring malformed DIAMOND_WINDOW=%r (expected 1280x800)", override)
+    if platform.system() != "Darwin":
+        return None
+    try:
+        out = subprocess.run(["osascript", "-l", "JavaScript", "-e", _MAC_VISIBLE_FRAME_JXA],
+                             capture_output=True, text=True, timeout=5, check=True).stdout
+        x, y, w, h = (int(float(v)) for v in out.strip().split(","))
+        return (x, y, w, h) if w > 200 and h > 200 else None
+    except (OSError, subprocess.SubprocessError, ValueError) as exc:
+        log.debug("screen size unavailable: %s", exc)
+        return None
+
+
+def window_launch_args(area: tuple[int, int, int, int] | None) -> list[str]:
+    if area is None:
+        return ["--start-maximized"]
+    x, y, w, h = area
+    return [f"--window-position={x},{y}", f"--window-size={w},{h}"]
+
+
 class BrowserCapture:
     """Runs one capture session. Thread-safe ``stop()``; ``run()`` blocks."""
 
@@ -50,6 +94,7 @@ class BrowserCapture:
         self._axe_pending = threading.Event()
         self.page: Any = None  # exposed for scripted sessions/tests
         self.ready = threading.Event()
+        self._cdp: dict[int, Any] = {}
 
     def stop(self) -> None:
         self._stop.set()
@@ -86,10 +131,29 @@ class BrowserCapture:
             path = self.store.shots / f"{int(ts)}_{kind}.jpg"
             if path.exists():
                 continue
+            started = time.time() * 1000
             try:
-                self.page.screenshot(path=str(path), type="jpeg", quality=60, animations="allow")
+                self._screenshot(path)
             except Exception as exc:  # page navigating / closed: a missing shot is not fatal
                 log.debug("screenshot skipped: %s", exc)
+            # Frames the engine itself stalled must not be reported as the app's lag.
+            self._engine_event("engine_busy", what="screenshot", url=getattr(self.page, "url", ""),
+                               start=started, end=time.time() * 1000)
+
+    def _screenshot(self, path: Path) -> None:
+        if self.headless:
+            self.page.screenshot(path=str(path), type="jpeg", quality=60, animations="allow")
+            return
+        # In the reviewer's real window, Playwright's screenshot re-applies device-metric
+        # emulation, which makes the visible page jump. A plain CDP capture of what is on
+        # screen changes nothing.
+        import base64
+
+        key = id(self.page)
+        if key not in self._cdp:
+            self._cdp[key] = self.page.context.new_cdp_session(self.page)
+        data = self._cdp[key].send("Page.captureScreenshot", {"format": "jpeg", "quality": 60})["data"]
+        path.write_bytes(base64.b64decode(data))
 
     def _run_axe(self) -> None:
         """Run axe-core on the current page after each inventory (only if configured)."""
@@ -131,18 +195,35 @@ class BrowserCapture:
             launch: dict[str, Any] = {"headless": self.headless}
             if self.cfg.browser_channel:
                 launch["channel"] = self.cfg.browser_channel
+            if not self.headless:
+                # The window opens at its final size, so nothing resizes after the page paints.
+                launch["args"] = window_launch_args(screen_work_area())
             try:
                 browser = pw.chromium.launch(**launch)
             except Exception as exc:
                 raise BrowserUnavailable(
                     f"could not start Chromium ({exc}). Run: python -m playwright install chromium") from exc
-            context = browser.new_context(viewport={"width": width, "height": height}, device_scale_factor=1)
+            if self.headless:
+                # Unattended passes: a fixed, reproducible viewport.
+                context = browser.new_context(viewport={"width": width, "height": height}, device_scale_factor=1)
+            else:
+                # A reviewer's window: the page uses the real window size and the screen's own
+                # pixel density. A fixed emulated viewport larger than the window hides the
+                # bottom of the page (unscrollable), and forcing DPR 1 on a Retina screen
+                # re-renders the page and blurs it.
+                context = browser.new_context(no_viewport=True)
             context.expose_function("__diamondEmit", self._on_batch)
             context.add_init_script(init)
             context.on("page", self._wire_page)
             self.page = context.new_page()
             self.page.goto(url, wait_until="domcontentloaded")
-            self.store.update_meta(browser_version=browser.version, viewport=[width, height])
+            actual = [width, height]
+            if not self.headless:
+                try:
+                    actual = self.page.evaluate("[innerWidth, innerHeight, devicePixelRatio]")
+                except Exception as exc:  # navigation in flight; the inventory records it later
+                    log.debug("viewport read skipped: %s", exc)
+            self.store.update_meta(browser_version=browser.version, viewport=actual)
             self.ready.set()
             try:
                 if script is not None:

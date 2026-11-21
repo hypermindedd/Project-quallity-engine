@@ -58,7 +58,8 @@ class ReviewSession:
             self._thread.join(timeout=30)
         if self.mic is not None:
             self.mic.stop()
-        self.store.update_meta(audio=self.audio_status)
+        # "recording" is the live state; on disk the finished session says "recorded".
+        self.store.update_meta(audio="recorded" if self.audio_status == "recording" else self.audio_status)
         return self.store.root
 
     def wait(self) -> Path:

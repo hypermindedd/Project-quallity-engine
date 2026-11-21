@@ -11,6 +11,11 @@
  */
 (() => {
   if (window.__diamondRecorder) return;
+  // Only the page the reviewer looks at. Init scripts also run in every iframe
+  // (ads, captchas, 1x1 trackers) whose events would pollute the analysis.
+  try { if (window.top !== window) return; } catch (_) { return; }
+  // The blank tab that exists before the first navigation is not part of the app.
+  if (!/^(https?|file):$/.test(location.protocol)) return;
   window.__diamondRecorder = true;
 
   const CFG = Object.assign(
